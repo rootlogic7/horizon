@@ -18,7 +18,7 @@ Dieses Repository enthält die deklarative Konfiguration für meine Maschinen-Fl
 * **Editor:** Neovim (Nixvim)
 * **Theme:** Gruvbox / Kanagawa (Zen-Ästhetik)
 
-## 🚀 Bootstrap (kaze)
+## 🚀 Bootstrap (`kaze`)
 *(Kurzanleitung für die Neuinstallation)*
 1. NixOS Live-USB booten.
 2. LUKS-Passwort setzen: `echo -n "passwort" > /tmp/secret.key`
