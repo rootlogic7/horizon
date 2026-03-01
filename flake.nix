@@ -61,6 +61,9 @@
           ./system/core.nix
           ./system/network.nix
 
+          # Display- und Grafik-Konfiguration
+          ./system/display.nix
+
           # Home-Manager als NixOS-Modul einbinden
           home-manager.nixosModules.home-manager
           {
