@@ -28,6 +28,12 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # greetd display manager and greeter
+    sysc-greet = {
+      url = "github:Nomadcxx/sysc-greet";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, disko, impermanence, nixos-hardware, nixvim, ... }@inputs: {
