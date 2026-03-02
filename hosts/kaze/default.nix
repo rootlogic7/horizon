@@ -3,8 +3,7 @@
 {
   system.stateVersion = "25.11";
 
-  # Importiere später die hardware-configuration.nix
-  # imports = [ ./hardware-configuration.nix ];
+  imports = [ ./hardware-configuration.nix ];
 
   networking = {
     hostName = "kaze";
@@ -40,15 +39,17 @@
     
       script = ''
         mkdir -p /btrfs_tmp
-        # Wir mounten das Top-Level Btrfs-Volume (Subvolid 5)
         mount -o subvol=/ /dev/mapper/cryptroot /btrfs_tmp
 
-        # Wenn das alte root-Subvolume existiert, wird es gelöscht
         if [ -d "/btrfs_tmp/root" ]; then
+            # Lösche erst alle verschachtelten Subvolumes (z.B. von systemd)
+            btrfs subvolume list -o /btrfs_tmp/root | cut -f9 -d' ' |
+            while read subvolume; do
+                btrfs subvolume delete "/btrfs_tmp/$subvolume"
+            done &&
             btrfs subvolume delete /btrfs_tmp/root
         fi
 
-        # Wir erstellen ein brandneues, leeres root-Subvolume
         btrfs subvolume create /btrfs_tmp/root
       
         umount /btrfs_tmp

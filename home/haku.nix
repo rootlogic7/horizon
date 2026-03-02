@@ -35,7 +35,6 @@
 
       # Web & Development
       firefox
-      git
       wget
       curl
     ];
@@ -43,6 +42,19 @@
 
   programs = {
     home-manager.enable = true;
+
+    # Deine neue deklarative Git-Konfiguration
+    git = {
+      enable = true;
+
+      settings = {
+        user.name = "haku";
+        user.email = "rootlogic7@proton.me";
+        init.defaultBranch = "main";
+        pull.rebase = true;
+      };
+    };
+
   };
 
   # Später:

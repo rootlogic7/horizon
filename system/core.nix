@@ -43,5 +43,5 @@
   };
 
   # Damit Nushell als Login-Shell funktioniert, muss sie systemweit aktiviert sein
-  programs.nushell.enable = true;
+  environment.shells = [ pkgs.nushell ];
 }

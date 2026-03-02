@@ -1,6 +1,8 @@
 { config, lib, ... }:
 
 {
+  fileSystems."/persist".neededForBoot = true;
+
   # Wir konfigurieren das Impermanence-Modul für das Root-Verzeichnis
   environment.persistence."/persist" = {
     # hideMounts sorgt dafür, dass Tools wie `df` oder `lsblk` nicht 
@@ -26,6 +28,14 @@
       "/etc/ssh/ssh_host_rsa_key"
       "/etc/ssh/ssh_host_rsa_key.pub"
     ];
+    # Persistente Daten für deinen Benutzer 'haku'
+    users.haku = {
+      directories = [
+        "enso"      # Dein NixOS-Flake
+        ".ssh"      # Deine SSH-Schlüssel
+        # Hier kannst du später auch "Downloads", "Documents" etc. eintragen!
+      ];
+    };  
   };
 
   # (Optional) Erlaube anderen Nutzern keinen Zugriff auf persistierte Systemdaten

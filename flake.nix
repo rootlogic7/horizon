@@ -47,7 +47,7 @@
         
         modules = [
           # Hardware-spezifische Module
-          nixos-hardware.nixosModules.lenovo-thinkpad-t470
+          nixos-hardware.nixosModules.lenovo-thinkpad-t470s
           ./hosts/kaze/disko.nix
           disko.nixosModules.disko
           
@@ -60,6 +60,7 @@
           # Systemweite Kern-Konfigurationen
           ./system/core.nix
           ./system/network.nix
+          ./system/impermanence.nix
 
           # Display- und Grafik-Konfiguration
           ./system/display.nix
