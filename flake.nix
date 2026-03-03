@@ -39,8 +39,8 @@
   outputs = { self, nixpkgs, home-manager, disko, impermanence, nixos-hardware, nixvim, sops-nix, ... }@inputs: {
     
     nixosConfigurations = {
-      # Host: kaze (ThinkPad T470)
-      kaze = nixpkgs.lib.nixosSystem {
+      # Host: nova (ThinkPad T470)
+      nova = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         # Wir geben alle Inputs an die Module weiter, damit wir sie überall nutzen können
         specialArgs = { inherit inputs; };
@@ -48,7 +48,7 @@
         modules = [
           # Hardware-spezifische Module
           nixos-hardware.nixosModules.lenovo-thinkpad-t470s
-          ./hosts/kaze/disko.nix
+          ./hosts/nova/disko.nix
           disko.nixosModules.disko
           
           # Das Impermanence Modul systemweit laden
@@ -58,7 +58,7 @@
 	  sops-nix.nixosModules.sops
 
           # Die Hauptkonfiguration für diesen Host
-          ./hosts/kaze/default.nix
+          ./hosts/nova/default.nix
           
           # Systemweite Kern-Konfigurationen
           ./system/core.nix
@@ -81,7 +81,7 @@
       };
       
       # Platzhalter für zukünftige Hosts:
-      # yama = nixpkgs.lib.nixosSystem { ... };
+      # quasar = nixpkgs.lib.nixosSystem { ... };
     };
   };
 }

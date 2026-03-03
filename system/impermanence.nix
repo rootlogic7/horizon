@@ -31,7 +31,7 @@
     # Persistente Daten für deinen Benutzer 'haku'
     users.haku = {
       directories = [
-        "enso"
+        "horizon"
         ".ssh"
         ".config/sops"
 

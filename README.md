@@ -1,26 +1,26 @@
-# ⭕ Enso - NixOS Flotilla
+# 🌌 horizon - NixOS Flotilla
 
-> "Aus dem Nichts geboren, ins Nichts zurückkehrend."
+> "Past the event horizon, nothing returns."
 
-Dieses Repository enthält die deklarative Konfiguration für meine Maschinen-Flotte, basierend auf **NixOS Flakes**. Das Kernkonzept des Laptops (`kaze`) ist **Erase your Darlings (Impermanence)**: Bei jedem Neustart wird das Root-Dateisystem (`/`) komplett gelöscht und aus einem leeren Btrfs-Snapshot neu generiert. Nur explizit definierte Daten überleben.
+Dieses Repository enthält die deklarative Konfiguration für meine Maschinen-Flotte, basierend auf **NixOS Flakes**. Das Kernkonzept des Laptops (`nova`) ist **Erase your Darlings (Impermanence)**: Bei jedem Neustart überschreitet das System seinen Ereignishorizont. Das Root-Dateisystem (`/`) wird komplett gelöscht und aus einem leeren Btrfs-Snapshot neu generiert. Nur explizit definierte Daten überleben.
 
-## 🌬️ Die Flotte
-* **`kaze` (Wind):** Lenovo ThinkPad T470 (Intel i5, 8GB RAM). Portabel, flüchtig, schnell.
-* **`yama` (Berg):** High-End PC (Geplant). Unerschütterlich, massiv.
-* **`kura` (Tresor):** Headless Server (Geplant). Bewahrer der Daten.
+## 🪐 Die Flotte
+* **`nova` (Laptop):** Lenovo ThinkPad T470 (Intel i5, 8GB RAM). Eine grelle, flüchtige Sternenexplosion. Portabel, schnell, wird bei jedem Shutdown ausgelöscht.
+* **`quasar` (Desktop):** High-End PC (Geplant). Purer Energiekern, massiv und leistungsstark.
+* **`pulsar` (Server):** Headless Server (Geplant). Rotiert stumm in der Dunkelheit. Bewahrer der persistenten Daten.
 
-## 🛠️ Tech Stack (`kaze`)
+## 🛠️ Tech Stack (`nova`)
 * **OS:** NixOS Unstable (25.11+)
 * **Deployment:** Flakes & Home-Manager
 * **Dateisystem:** Btrfs mit LUKS Full Disk Encryption (via Disko)
 * **Desktop:** Hyprland (Wayland)
 * **Terminal:** Foot, Zellij, Nushell, Starship
 * **Editor:** Neovim (Nixvim)
-* **Theme:** Gruvbox / Kanagawa (Zen-Ästhetik)
+* **Theme:** Catppuccin Mocha (Kosmische Ästhetik)
 
-## 🚀 Bootstrap (`kaze`)
+## 🚀 Bootstrap (`nova`)
 *(Kurzanleitung für die Neuinstallation)*
 1. NixOS Live-USB booten.
 2. LUKS-Passwort setzen: `echo -n "passwort" > /tmp/secret.key`
-3. Disko Partitionierung ausführen: `sudo nix run github:nix-community/disko -- --mode disko /pfad/zu/enso/hosts/kaze/disko.nix`
-4. System installieren: `sudo nixos-install --flake .#kaze`
+3. Disko Partitionierung ausführen: `sudo nix run github:nix-community/disko -- --mode disko /pfad/zu/horizon/hosts/nova/disko.nix`
+4. System installieren: `sudo nixos-install --flake .#nova`

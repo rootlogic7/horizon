@@ -49,7 +49,7 @@
 
       settings = {
         user.name = "haku";
-        user.email = "rootlogic7@proton.me";
+        user.email = "haku@horizon.net";
         init.defaultBranch = "main";
         pull.rebase = true;
       };
@@ -83,7 +83,7 @@
   # Den GPG-Agent als Service starten (fragt nach dem Passwort zum Entschlüsseln)
   services.gpg-agent = {
     enable = true;
-    pinentryPackage = pkgs.pinentry-gnome3; # Eine saubere GUI-Passwortabfrage für Wayland
+    pinentry.package = pkgs.pinentry-gnome3; # Eine saubere GUI-Passwortabfrage für Wayland
   };
 
   imports = [

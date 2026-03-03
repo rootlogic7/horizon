@@ -10,7 +10,7 @@
     settings = {
       default_session = {
         # Startet tuigreet mit Uhrzeit (--time) und weist es an, Hyprland zu starten (--cmd)
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd start-hyprland";
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd start-hyprland";
         user = "greeter";
       };
     };

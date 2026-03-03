@@ -6,7 +6,7 @@
   imports = [ ./hardware-configuration.nix ];
 
   networking = {
-    hostName = "kaze";
+    hostName = "nova";
   };
 
   # 🚀 Bootloader Konfiguration

@@ -13,7 +13,7 @@
 
   # Zeitzone und Sprache (Deutschland)
   time.timeZone = "Europe/Berlin";
-  i18n.defaultLocale = "de_DE.UTF-8";
+  i18n.defaultLocale = "en_US.UTF-8";
 
   # Globales Tastaturlayout
   services.xserver.xkb = {
@@ -45,7 +45,7 @@
   # Der Hauptnutzer: haku
   users.users.haku = {
     isNormalUser = true;
-    description = "Der Geist in der Maschine";
+    description = "admin";
     # 'wheel' gibt dir sudo-Rechte, 'networkmanager' erlaubt WLAN-Änderungen ohne Passwort
     extraGroups = [ "networkmanager" "wheel" "video" "input" ];
 
