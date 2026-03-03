@@ -57,10 +57,9 @@
 
   };
 
-  # Später:
-  # imports = [
+  imports = [
   #   ./shell/default.nix
-  #   ./desktop/default.nix
+    ./desktop/default.nix
   #   ./programs/default.nix
-  # ];
+  ];
 }

@@ -41,10 +41,8 @@
         "$mod, j, movefocus, d"
         "$mod, k, movefocus, u"
         "$mod, l, movefocus, r"
-      ];
 
-      # Workspaces (Arbeitsflächen) wechseln
-      bind = [
+	# Workspaces
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
         "$mod, 3, workspace, 3"

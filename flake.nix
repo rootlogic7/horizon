@@ -70,7 +70,8 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = { inherit inputs; };
+            home-manager.extraSpecialArgs = { inherit inputs; }
+	    home-manager.backupFileExtension = "backup";;
             home-manager.users.haku = import ./home/haku.nix;
           }
         ];
