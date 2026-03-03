@@ -1,0 +1,12 @@
+keys:
+  # Public Age Key 'host_kaze'
+  - &host_kaze "age1j809mn4m29jve59c54flhz2vdpy6mxn8j230m64rg0238fs4vfysa4kj6x"
+  # Public Age Key 'haku_kaze'
+  - &haku_kaze "age1eycv5vdxaze35ux64p8rmgvpdvfv3t4vtr8k7plfe3cwrd9edalsqu4l3u"
+creation_rules:
+  # Alle Dateien im Ordner 'secrets', die auf .yaml enden, werden mit diesem Key verschlüsselt
+  - path_regex: secrets/[^/]+\.yaml$
+    key_groups:
+      - age:
+        - *host_kaze
+        - *haku_kaze

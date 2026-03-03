@@ -1,7 +1,7 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
-  # ❄️ Moderne Nix-Features aktivieren
+  # oderne Nix-Features aktivieren
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   
   # Speichermanagement: Alte Pakete automatisch aufräumen
@@ -26,18 +26,36 @@
     XKB_DEFAULT_LAYOUT = "de";
     XKB_DEFAULT_VARIANT = "nodeadkeys";
   };
+  # SOPS Secrets Konfiguration
+  sops = {
+    defaultSopsFile = ../secrets/secrets.yaml;
+    defaultSopsFormat = "yaml";
+  
+    # SOPS sagen, wo es den Host-Key zum Entschlüsseln findet.
+    # Da impermanence aktiv ist, greifen wir am besten direkt auf den /persist Pfad zu,
+    # um Probleme beim frühen Booten (early boot) zu vermeiden.
+    age.sshKeyPaths = [ "/persist/etc/ssh/ssh_host_ed25519_key" ];
 
-  # 👤 Der Hauptnutzer: haku
+    # Unser Passwort-Secret definieren
+    secrets.haku_password = {
+      neededForUsers = true; # Wichtig: Muss VOR dem Erstellen der User entschlüsselt werden!
+    };
+  };
+
+  # Der Hauptnutzer: haku
   users.users.haku = {
     isNormalUser = true;
     description = "Der Geist in der Maschine";
     # 'wheel' gibt dir sudo-Rechte, 'networkmanager' erlaubt WLAN-Änderungen ohne Passwort
     extraGroups = [ "networkmanager" "wheel" "video" "input" ];
+
+    hashedPasswordFile = config.sops.secrets.haku_password.path;
     
-    # ⚠️ WICHTIG: Ein temporäres Passwort für den allerersten Login. 
+    # ICHTIG: Ein temporäres Passwort für den allerersten Login. 
     # Nach der Installation solltest du sofort "passwd" im Terminal ausführen!
-    initialPassword = "haku"; 
-    
+    # initialPassword = "haku"; 
+    # === -> sops-nix kümmert sich nun um das passwort für haku ===
+
     # Wir setzen Nushell direkt als Standard-Shell
     shell = pkgs.nushell;
   };

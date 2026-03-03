@@ -31,9 +31,9 @@
     # Persistente Daten für deinen Benutzer 'haku'
     users.haku = {
       directories = [
-        "enso"      # Dein NixOS-Flake
-        ".ssh"      # Deine SSH-Schlüssel
-        # Hier kannst du später auch "Downloads", "Documents" etc. eintragen!
+        "enso"
+        ".ssh"
+        ".config/sops"
       ];
     };  
   };
