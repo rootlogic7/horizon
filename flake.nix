@@ -34,9 +34,14 @@
       url = "github:Nomadcxx/sysc-greet";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # sops
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, impermanence, nixos-hardware, nixvim, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, disko, impermanence, nixos-hardware, nixvim, sops-nix, ... }@inputs: {
     
     nixosConfigurations = {
       # 💻 Host: kaze (ThinkPad T470)
@@ -53,6 +58,9 @@
           
           # Das Impermanence Modul systemweit laden
           impermanence.nixosModules.impermanence
+
+	  # sops-nix Modul systemweit laden
+	  sops-nix.nixosModules.sops
 
           # Die Hauptkonfiguration für diesen Host
           ./hosts/kaze/default.nix
