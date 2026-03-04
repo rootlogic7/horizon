@@ -14,9 +14,10 @@
     # Dem Kernel einen Maulkorb verpassen, damit Plymouth glänzen kann
     kernelParams = [ 
       "quiet" 
-      "splash" 
+#      "splash" 
       "loglevel=3" 
-      "rd.systemd.show_status=false" 
+#      "rd.systemd.show_status=false" 
+      "systemd.show_status=auto"
       "rd.udev.log_level=3" 
       "udev.log_priority=3" 
     ];
@@ -31,9 +32,18 @@
     };
 
     # Plymouth für den Boot-Splash
-    plymouth.enable = true;
+    plymouth = {
+      enable = true;
+      theme = "cyanide";
+      themePackages = with pkgs; [
+        # By default we would install all themes
+        (adi1090x-plymouth-themes.override {
+          selected_themes = [ "cyanide" ];
+        })
+      ];
+    };
 
-    # ⚙️ Modernes Impermanence: systemd in der initrd
+    # odernes Impermanence: systemd in der initrd
     initrd.systemd.enable = true;
 
     # Der systemd-Service für den Btrfs-Rollback

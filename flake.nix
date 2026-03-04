@@ -34,6 +34,8 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    catppuccin.url = "github:catppuccin/nix";
   };
 
   outputs = { self, nixpkgs, home-manager, disko, impermanence, nixos-hardware, nixvim, sops-nix, ... }@inputs: {
@@ -75,7 +77,14 @@
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = { inherit inputs; };
 	    home-manager.backupFileExtension = "backup";
-            home-manager.users.haku = import ./home/haku.nix;
+
+            # Wir binden das Catppuccin-Modul direkt in deinen User ein
+            home-manager.users.haku = {
+              imports = [
+                inputs.catppuccin.homeModules.catppuccin
+                ./home/haku.nix
+              ];
+            };
           }
         ];
       };

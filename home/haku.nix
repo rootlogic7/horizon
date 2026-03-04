@@ -16,18 +16,12 @@
       # Wayland & Desktop
       hyprpaper
       hypridle
-      waybar
-      mako
-      fuzzel
     
-      # Terminal & Workflow
-      foot
-      zellij
+      # File Explorer
       yazi
 
       # Rust-basierte CLI-Tools (Die modernen Alternativen)
       eza      # Moderner ls-Ersatz
-      bat      # Moderner cat-Ersatz
       zoxide   # Smarter cd-Ersatz
       ripgrep  # Extrem schnelles grep
       fd       # Schnelleres find
@@ -89,6 +83,7 @@
   imports = [
   #   ./shell/default.nix
     ./desktop/default.nix
+    ./theme.nix
   #   ./programs/default.nix
   ];
 }
