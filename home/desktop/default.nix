@@ -1,8 +1,8 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   xdg.configFile."waybar/config".source = ./waybar/config.jsonc;
-  xdg.configFile."waybar/style.css".source = ./waybar/style.css;
+  xdg.configFile."waybar/style.css".source = lib.mkForce ./waybar/style.css;
 
   wayland.windowManager.hyprland = {
     enable = true;

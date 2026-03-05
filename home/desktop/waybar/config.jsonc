@@ -28,10 +28,10 @@
         "format": "{icon} {capacity}%",
         "format-charging": " {capacity}%",
         "format-plugged": " {capacity}%",
-        "format-icons": ["", "", "", "", ""]
+        "format-icons": [" ", " ", " ", " ", " "]
     },
     "network": {
-        "format-wifi": " {essid}",
+        "format-wifi": "  {essid}",
         "format-ethernet": " {ipaddr}/{cidr}",
         "tooltip-format": " {ifname} via {gwaddr}",
         "format-linked": " {ifname} (No IP)",
@@ -41,10 +41,10 @@
     "pulseaudio": {
         "format": "{icon} {volume}%",
         "format-bluetooth": "{icon} {volume}%",
-        "format-muted": "",
+        "format-muted": " ",
         "format-icons": {
-            "headphone": "",
-            "default": ["", ""]
+            "headphone": " ",
+            "default": [" ", " "]
         }
     }
 }
