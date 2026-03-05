@@ -1,6 +1,9 @@
 { config, pkgs, ... }:
 
 {
+  xdg.configFile."waybar/config".source = ./waybar/config.jsonc;
+  xdg.configFile."waybar/style.css".source = ./waybar/style.css;
+
   wayland.windowManager.hyprland = {
     enable = true;
     
@@ -24,6 +27,7 @@
 
       exec-once = [
         "${pkgs.swaybg}/bin/swaybg -i ${./wallpaper.jpg} -m fill"
+        "waybar"
       ];
 
       # 🎨 NEU: Das visuelle Ricing (Hier greifen die Catppuccin-Farben!)

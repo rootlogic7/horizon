@@ -1,0 +1,46 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font", "Fira Code Nerd Font", sans-serif;
+    font-size: 14px;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: rgba(30, 30, 46, 0.85); /* Catppuccin Mocha Base mit leichter Transparenz */
+    color: #cdd6f4; /* Text (Text) */
+    border-bottom: 2px solid #cba6f7; /* Unterer Rand in Mauve */
+}
+
+tooltip {
+    background: #1e1e2e;
+    border: 1px solid #cba6f7;
+    border-radius: 8px;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #a6adc8; /* Inaktive (Subtext0) */
+}
+
+#workspaces button.active {
+    color: #cba6f7; /* Aktive in Mauve */
+    font-weight: bold;
+}
+
+#clock, #battery, #network, #pulseaudio, #tray {
+    padding: 0 12px;
+    margin: 4px 4px;
+    border-radius: 8px;
+    background-color: #313244; /* Surface0 */
+    color: #cdd6f4;
+}
+
+#battery.charging {
+    color: #a6e3a1; /* Green */
+}
+
+#battery.warning:not(.charging) {
+    background-color: #f38ba8; /* Red */
+    color: #1e1e2e;
+}
