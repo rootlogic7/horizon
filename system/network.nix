@@ -1,16 +1,16 @@
 { config, ... }:
 
 {
-  # 🔐 1. SOPS: Das WLAN-Passwort aus der secrets.yaml laden
+  # 1. SOPS: Das WLAN-Passwort aus der secrets.yaml laden
   sops.secrets.wifi_psk = {};
 
-  # 📝 2. SOPS Template: Wir erstellen eine temporäre .env-Datei im RAM
+  # 2. SOPS Template: Wir erstellen eine temporäre .env-Datei im RAM
   # Diese wird vom NetworkManager gelesen, um das $WIFI_PSK aufzulösen.
   sops.templates."networkmanager.env".content = ''
     WIFI_PSK=${config.sops.placeholder.wifi_psk}
   '';
 
-  # 📶 3. NetworkManager Konfiguration
+  # 3. NetworkManager Konfiguration
   networking.networkmanager = {
     enable = true;
     
@@ -39,12 +39,12 @@
     };
   };
 
-  # 🛡️ Firewall aktivieren
+  # Firewall aktivieren
   networking.firewall.enable = true;
   # SSH-Port (22) öffnen
   networking.firewall.allowedTCPPorts = [ 22 ];
 
-  # 🔑 SSH-Server (OpenSSH) konfigurieren
+  # SSH-Server (OpenSSH) konfigurieren
   services.openssh = {
     enable = true;
     settings = {
