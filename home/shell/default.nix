@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, osConfig, ... }:
 
 {
   # Alle CLI-Tools, die du primär in der Shell nutzt
@@ -22,6 +22,16 @@
         la = "ls -a";
         ls = "eza";
         tree = "eza --tree";
+
+        # Git
+        gs = "git status";
+        ga = "git add";
+        gc = "git commit -m";
+        gp = "git push";
+
+        # Nixos
+        nix-switch = "sudo nixos-rebuild switch --flake .#${osConfig.networking.hostName}";
+        nix-update = "nix flake update";
       };
 
       # Keine manuellen Init-Skripte mehr nötig für Zoxide/Starship!
