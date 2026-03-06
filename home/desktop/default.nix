@@ -29,12 +29,18 @@
       "$terminal" = "foot";
       "$menu" = "fuzzel";
 
+      # EU: Hyprland zwingen, den Cursor zu respektieren
+      env = [
+        "XCURSOR_THEME,phinger-cursors-light"
+        "XCURSOR_SIZE,24"
+      ];
+
       exec-once = [
         "${pkgs.swaybg}/bin/swaybg -i ${./wallpaper.jpg} -m fill"
         "waybar"
       ];
 
-      # 🎨 NEU: Das visuelle Ricing (Hier greifen die Catppuccin-Farben!)
+      # NEU: Das visuelle Ricing (Hier greifen die Catppuccin-Farben!)
       general = {
         gaps_in = 5;
         gaps_out = 10;
@@ -48,12 +54,12 @@
       };
 
       decoration = {
-        rounding = 8;
+        rounding = 3;
         
         blur = {
           enabled = true;
-          size = 3;
-          passes = 1;
+          size = 4;
+          passes = 3;
         };
       };
 
