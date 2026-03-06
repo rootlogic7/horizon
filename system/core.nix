@@ -51,14 +51,17 @@
 
     hashedPasswordFile = config.sops.secrets.haku_password.path;
     
-    # ICHTIG: Ein temporäres Passwort für den allerersten Login. 
+    # WICHTIG: Ein temporäres Passwort für den allerersten Login. 
     # Nach der Installation solltest du sofort "passwd" im Terminal ausführen!
     # initialPassword = "haku"; 
     # === -> sops-nix kümmert sich nun um das passwort für haku ===
-
-    # Wir setzen Nushell direkt als Standard-Shell
-    shell = pkgs.nushell;
   };
+
+  programs.bash.interactiveShellInit = ''
+    if [[ $TERM != "dumb" && -z "''${BASH_EXECUTION_STRING}" ]]; then
+      exec nu
+    fi
+  '';
 
   # Damit Nushell als Login-Shell funktioniert, muss sie systemweit aktiviert sein
   environment.shells = [ pkgs.nushell ];

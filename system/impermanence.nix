@@ -39,6 +39,10 @@
         ".password-store"  # Der eigentliche 'pass' Tresor
         ".mozilla"         # Firefox Profil & Addons
         ".config/mozilla"
+
+        ".config/nushell"
+        ".local/share/zoxide"
+        # ".cache/zoxide"
       ];
     };  
   };
