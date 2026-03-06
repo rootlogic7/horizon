@@ -21,6 +21,7 @@
     impermanence = {
       url= "github:nix-community/impermanence";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # NixOS Hardware-Profile (enthält TLP, Microcode etc. für dein T470)
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
@@ -40,6 +41,7 @@
     catppuccin = {
       url = "github:catppuccin/nix";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, disko, impermanence, nixos-hardware, nixvim, sops-nix, ... }@inputs: {
