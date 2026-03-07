@@ -39,14 +39,17 @@
 
   # Bootloader Konfiguration
   boot = {
+    initrd.availableKernelModules = [ "i915" ];
     initrd.kernelModules = [ "i915" ];
     # Dem Kernel einen Maulkorb verpassen, damit Plymouth glänzen kann
     kernelParams = [ 
       "quiet"
       #"loglevel=3"
-      "systemd.show_status=auto"
+      "systemd.show_status=false"
       "udev.log_level=3"
-      #"udev.log_priority=3"
+      "rd.systemd.show_status=false"
+      "rd.udev.log_level=3"
+      #"plymouth.use-simpledrm"
     ];
     # Konsolen-Logs während des Bootens komplett verstecken
     consoleLogLevel = 3;
@@ -61,11 +64,11 @@
     # Plymouth für den Boot-Splash
     plymouth = {
       enable = true;
-      theme = "cyanide";
+      theme = "spin";
       themePackages = with pkgs; [
         # By default we would install all themes
         (adi1090x-plymouth-themes.override {
-          selected_themes = [ "cyanide" ];
+          selected_themes = [ "spin" ];
         })
       ];
     };

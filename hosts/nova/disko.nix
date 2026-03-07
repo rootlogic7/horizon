@@ -25,7 +25,7 @@
                 type = "luks";
                 name = "cryptroot";
                 # Liest das Passwort bei der Installation aus dieser Datei:
-                passwordFile = "/tmp/secret.key";
+                # passwordFile = "/tmp/secret.key";
                 settings = {
                   allowDiscards = true; # TRIM-Support für NVMe (wichtig für SSD-Gesundheit)
                 };
