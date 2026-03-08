@@ -10,6 +10,8 @@ with lib;
     stateVersion = "25.11";
   };
 
+  horizon.theme.enable = true;
+
   programs.home-manager.enable = true;
 
   # === SoC Magie ===
