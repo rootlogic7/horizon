@@ -1,7 +1,7 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
-  #System
+  # System
   system.stateVersion = "25.11";
 
   # Imports
@@ -18,8 +18,14 @@
   ];
 
   # Networking
-  networking = {
-    hostName = "nova";
+  networking.hostName = "nova";
+
+  # === NEU: SoC Opt-In Features aktivieren ===
+  horizon = {
+    desktop.enable = true;
+    impermanence.enable = true;
+    network.enable = true;
+    security.enable = true;
   };
 
   # Home Manager  
@@ -41,16 +47,16 @@
   boot = {
     initrd.availableKernelModules = [ "i915" ];
     initrd.kernelModules = [ "i915" ];
+    
     # Dem Kernel einen Maulkorb verpassen, damit Plymouth glänzen kann
     kernelParams = [ 
       "quiet"
-      #"loglevel=3"
       "systemd.show_status=false"
       "udev.log_level=3"
       "rd.systemd.show_status=false"
       "rd.udev.log_level=3"
-      #"plymouth.use-simpledrm"
     ];
+
     # Konsolen-Logs während des Bootens komplett verstecken
     consoleLogLevel = 3;
     initrd.verbose = false;
@@ -66,7 +72,6 @@
       enable = true;
       theme = "spin";
       themePackages = with pkgs; [
-        # By default we would install all themes
         (adi1090x-plymouth-themes.override {
           selected_themes = [ "spin" ];
         })
@@ -81,12 +86,8 @@
       description = "Rollback Btrfs root subvolume to a pristine state";
       wantedBy = [ "initrd.target" ];
     
-      # Die entscheidenden Abhängigkeiten:
-      # 1. Muss NACH der LUKS-Entschlüsselung laufen (cryptroot ist der Name aus disko.nix)
       after = [ "systemd-cryptsetup@cryptroot.service" ];
-      # 2. Muss VOR dem eigentlichen Mounten von / laufen
       before = [ "sysroot.mount" ];
-    
       unitConfig.DefaultDependencies = "no";
       serviceConfig.Type = "oneshot";
     
@@ -109,10 +110,4 @@
       '';
     };
   };
-  # Hardware-Spezifische Sicherheit (ThinkPad T470 Fingerprint)
-  # services.fprintd.enable = true;
-  
-  # PAM so konfigurieren, dass sudo und su den Fingerabdruck akzeptieren
-  #security.pam.services.sudo.fprintAuth = true;
-  #security.pam.services.su.fprintAuth = true;
 }

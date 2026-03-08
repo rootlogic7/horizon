@@ -1,23 +1,34 @@
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
-{
-# Hyprland systemweit aktivieren
-  programs.hyprland.enable = true;
-
-  # greetd mit tuigreet als Display Manager
-  services.greetd = {
-    enable = true;
-    settings = {
-      default_session = {
-        # Startet tuigreet mit Uhrzeit (--time) und weist es an, Hyprland zu starten (--cmd)
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd start-hyprland";
-        user = "greeter";
-      };
-    };
+with lib;
+let
+  # Wir definieren einen kurzen Alias für unsere neue Option
+  cfg = config.horizon.desktop;
+in {
+  # 1. Optionen definieren (Das "Interface" für die Hosts)
+  options.horizon.desktop = {
+    enable = mkEnableOption "Enable Desktop Environment (Hyprland, Greetd, Fonts)";
   };
 
-  # Schriftarten (Fonts)
-  fonts.packages = with pkgs; [
-    nerd-fonts.departure-mono
-  ];
+  # 2. Die eigentliche Konfiguration (wird nur angewendet, wenn enable = true)
+  config = mkIf cfg.enable {
+    # Hyprland systemweit aktivieren
+    programs.hyprland.enable = true;
+
+    # greetd mit tuigreet als Display Manager
+    services.greetd = {
+      enable = true;
+      settings = {
+        default_session = {
+          command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd start-hyprland";
+          user = "greeter";
+        };
+      };
+    };
+
+    # Schriftarten (Fonts)
+    fonts.packages = with pkgs; [
+      nerd-fonts.departure-mono
+    ];
+  };
 }

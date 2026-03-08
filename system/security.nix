@@ -1,20 +1,21 @@
-# system/security.nix
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
-{
-  # olkit (Ermöglicht unprivilegierten Prozessen, Admin-Rechte anzufragen)
-  security.polkit.enable = true;
+with lib;
+let
+  cfg = config.horizon.security;
+in {
+  options.horizon.security = {
+    enable = mkEnableOption "Enable Security Tools (Polkit, Gnome Keyring, Sudo)";
+  };
 
-  # Passwort-Management & Keyring (für 'pass', GPG und System-Passwörter)
-  services.gnome.gnome-keyring.enable = true;
-  security.pam.services.greetd.enableGnomeKeyring = true;
-
-  # (Optional, aber empfohlen) Rtkit für Realtime-Scheduling (wichtig für Audio/Pipewire)
-  security.rtkit.enable = true;
-
-  # Sudo-Sicherheit (Standardmäßig gut, aber hier kannst du später feintunen)
-  security.sudo = {
-    enable = true;
-    execWheelOnly = true; # Nur Mitglieder der 'wheel' Gruppe dürfen sudo ausführen
+  config = mkIf cfg.enable {
+    security.polkit.enable = true;
+    services.gnome.gnome-keyring.enable = true;
+    security.pam.services.greetd.enableGnomeKeyring = true;
+    security.rtkit.enable = true;
+    security.sudo = {
+      enable = true;
+      execWheelOnly = true;
+    };
   };
 }
