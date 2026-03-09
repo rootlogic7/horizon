@@ -26,6 +26,11 @@
     impermanence.enable = true;
     network.enable = true;
     security.enable = true;
+
+    power = {
+      enable = true;
+      chargeThreshold = 85; # Überschreibt den 80% Standard, falls du etwas mehr Kapazität willst
+    };
   };
 
   # Home Manager  

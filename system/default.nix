@@ -7,5 +7,6 @@
     ./impermanence.nix
     ./network.nix
     ./security.nix
+    ./power.nix
   ];
 }

@@ -1,24 +1,68 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 34,
-    "spacing": 4,
+    "height": 42, // Etwas größer für bessere Lesbarkeit
+    "spacing": 8, // Mehr Luft zwischen den Kapseln
     "exclusive": true,
-    "modules-left": ["hyprland/workspaces", "hyprland/window"],
-    "modules-center": ["clock"],
-    "modules-right": ["network", "pulseaudio", "battery", "tray"],
+    
+    // Reihenfolge wie gewünscht:
+    "modules-left": ["custom/nixos", "custom/userhost", "cpu", "memory", "hyprland/workspaces"],
+    "modules-center": ["hyprland/window"],
+    "modules-right": ["network", "pulseaudio", "battery", "clock"],
 
+    // --- LINKE SEITE ---
+    "custom/nixos": {
+        "format": "", // NixOS Logo
+        "tooltip": false,
+        "on-click": "notify-send 'System' 'Control Center folgt in Kürze...'" // Platzhalter für später
+    },
+    "custom/userhost": {
+        // Zieht sich den Titel des aktiven Fensters. Sucht nach "irgendwas@irgendwas". Wenn nicht gefunden -> haku@nova.
+        "exec": "title=$(hyprctl activewindow -j | jq -r '.title' 2>/dev/null); extracted=$(echo \"$title\" | grep -oE '[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+' | head -n 1); if [ -n \"$extracted\" ]; then echo \"$extracted\"; else echo \"haku@nova\"; fi",
+        "interval": 1, // Jede Sekunde checken
+        "format": " {}",
+        "tooltip": false
+    },
+    "cpu": {
+        "format": "  {usage}%",
+        "tooltip": false
+    },
+    "memory": {
+        "format": "  {percentage}%",
+        "tooltip": false
+    },
     "hyprland/workspaces": {
         "format": "{icon}",
         "on-click": "activate",
+        "persistent-workspaces": {
+            "*": [1, 2, 3, 4, 5] // Erzwingt 5 fixe Platzhalter-Workspaces
+        },
         "format-icons": {
             "active": "",
             "default": ""
         }
     },
-    "clock": {
-        "format": " {:%H:%M   %d.%m.%Y}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+
+    // --- MITTE ---
+    "hyprland/window": {
+        "format": "{title}",
+        "max-length": 50 // Kürzt zu lange Titel ab, damit die Kapsel nicht explodiert
+    },
+
+    // --- RECHTE SEITE ---
+    "network": {
+        "format-wifi": "  {essid}",
+        "format-ethernet": "󰈀 LAN",
+        "tooltip-format": " {ifname} via {gwaddr}",
+        "format-disconnected": "⚠ Offline"
+    },
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": " Muted",
+        "format-icons": {
+            "headphone": " ",
+            "default": [" ", " "]
+        }
     },
     "battery": {
         "states": {
@@ -27,24 +71,9 @@
         },
         "format": "{icon} {capacity}%",
         "format-charging": " {capacity}%",
-        "format-plugged": " {capacity}%",
         "format-icons": [" ", " ", " ", " ", " "]
     },
-    "network": {
-        "format-wifi": "  {essid}",
-        "format-ethernet": "󰈀 {ipaddr}/{cidr}",
-        "tooltip-format": " {ifname} via {gwaddr}",
-        "format-linked": " {ifname} (No IP)",
-        "format-disconnected": "⚠ Disconnected",
-        "format-alt": "{ifname}: {ipaddr}/{cidr}"
-    },
-    "pulseaudio": {
-        "format": "{icon} {volume}%",
-        "format-bluetooth": "{icon} {volume}%",
-        "format-muted": " ",
-        "format-icons": {
-            "headphone": " ",
-            "default": [" ", " "]
-        }
+    "clock": {
+        "format": " {:%H:%M}" // Nur noch Uhrzeit
     }
 }
