@@ -10,10 +10,7 @@ in {
     settings = {
       
       # 1. Monitore
-      monitor = [
-        "eDP-1,1366x768@60,0x0,1"
-        "DP-6,1280x1024@60,0x-1024,1"
-      ];
+      monitor = osConfig.horizon.desktop.monitors;
 
       # 2. Tastatur & Touchpad (Laptop-Optimierungen)
       input = {
