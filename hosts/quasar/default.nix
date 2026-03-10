@@ -22,10 +22,11 @@
   # === SoC Opt-In Features aktivieren ===
   horizon = {
     desktop.enable = true;
-    horizon.desktop.monitors = [
-    "DP-1,3440x1440@100,0x0,1"
-    "HDMI-A-1,1920x1080@60,3440x0,1"
-  ];
+    desktop.monitors = [
+      "DP-1,3440x1440@100,0x0,1"
+      "HDMI-A-1,1920x1080@60,3440x0,1"
+    ];
+
     impermanence.enable = true;
     network.enable = true;
     security.enable = true;
