@@ -1,31 +1,56 @@
+# hosts/quasar/default.nix
 { config, pkgs, lib, inputs, ... }:
 
 {
-  system.stateVersion = "25.11";
+  system.stateVersion = "25.11"; # Oder deine entsprechende Version
 
   imports = [ 
     ./hardware-configuration.nix
     ./disko.nix
     inputs.disko.nixosModules.disko
-    # ...
+    
+    # Unsere gebündelten System-Module (inkl. nvidia.nix)
+    ../../system/default.nix
+
+    # Home-Manager direkt im Host einbinden
+    inputs.home-manager.nixosModules.home-manager
   ];
 
   networking.hostName = "quasar";
-  networking.hostId = "8425e349";
+  networking.hostId = "DEINE_ALTE_ID"; # WICHTIG: Hier die ID des alten Systems eintragen!
 
+  # === NEU: SoC Opt-In Features aktivieren ===
   horizon = {
     desktop.enable = true;
     impermanence.enable = true;
     network.enable = true;
     security.enable = true;
+    
+    # Nvidia & Wayland Tweaks aktivieren
     hardware.nvidia.enable = true;
   };
 
+  # === Home Manager Setup ===
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    extraSpecialArgs = { inherit inputs; };
+    backupFileExtension = "backup";
+    
+    users.haku = {
+      imports = [
+        inputs.catppuccin.homeModules.catppuccin
+        ../../home/haku.nix
+      ];
+    };
+  };
+
+  # === Boot & Dateisystem (ZFS & LUKS) ===
   boot = {
     supportedFilesystems = [ "zfs" ];
     zfs.requestEncryptionCredentials = true;
 
-    # --- Die alten HDDs (RAID 1 & Massenspeicher) einbinden ---
+    # --- Die alten HDDs (RAID 1 & Massenspeicher) via LUKS einbinden ---
     initrd.luks.devices = {
       "crypt_safe1" = { device = "/dev/disk/by-id/ata-TOSHIBA_DT01ACA200_94JKP2VHS-part1"; preLVM = true; };
       "crypt_safe2" = { device = "/dev/disk/by-id/ata-WDC_WD40EZRZ-22GXCB0_WD-WCC7K5LD8Y9V-part1"; preLVM = true; };
@@ -50,16 +75,13 @@
     };
   };
 
-  # SSD TRIM für ZFS aktivieren
   services.zfs.trim.enable = true;
 
   # --- Mounts für die alten HDD-ZFS-Pools ---
   fileSystems."/storage/backup" = { device = "safe/backup"; fsType = "zfs"; };
   fileSystems."/storage/media"  = { device = "extra/media"; fsType = "zfs"; };
 
-  # Disko generiert die Mounts für die SSDs automatisch. 
-  # Wir markieren persist und home aber zusätzlich als 'neededForBoot', 
-  # damit das Impermanence-Modul sauber funktioniert (wie in deiner alten Config).
+  # Wichtig für Impermanence (Disko mountet den Rest automatisch)
   fileSystems."/persist".neededForBoot = true;
   fileSystems."/home".neededForBoot = true;
 }
