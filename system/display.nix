@@ -8,6 +8,11 @@ in {
   # 1. Optionen definieren (Das "Interface" für die Hosts)
   options.horizon.desktop = {
     enable = mkEnableOption "Enable Desktop Environment (Hyprland, Greetd, Fonts)";
+    monitors = mkOption {
+      type = types.listOf types.str;
+      default = [ ",preferred,auto,1" ]; # Fallback, falls mal nichts definiert ist
+      description = "Liste der Monitor-Konfigurationen für Hyprland";
+    };
   };
 
   # 2. Die eigentliche Konfiguration (wird nur angewendet, wenn enable = true)
