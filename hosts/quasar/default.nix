@@ -2,7 +2,7 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
-  system.stateVersion = "25.11"; # Oder deine entsprechende Version
+  system.stateVersion = "25.11";
 
   imports = [ 
     ./hardware-configuration.nix
@@ -17,9 +17,9 @@
   ];
 
   networking.hostName = "quasar";
-  networking.hostId = "DEINE_ALTE_ID"; # WICHTIG: Hier die ID des alten Systems eintragen!
+  networking.hostId = "8425e349";
 
-  # === NEU: SoC Opt-In Features aktivieren ===
+  # === SoC Opt-In Features aktivieren ===
   horizon = {
     desktop.enable = true;
     impermanence.enable = true;
@@ -57,7 +57,7 @@
       "crypt_extra" = { device = "/dev/disk/by-id/ata-WDC_WD40EZRZ-22GXCB0_WD-WCC7K5LD8Y9V-part2"; preLVM = true; };
     };
 
-    # --- ZFS Erase Your Darlings Rollback (für die neuen SSDs) ---
+    # --- ZFS Erase Your Darlings Rollback (für die nvme SSDs) ---
     initrd.systemd.enable = true;
     initrd.systemd.services.zfs-rollback = {
       description = "Rollback ZFS datasets to a pristine state";
@@ -77,7 +77,7 @@
 
   services.zfs.trim.enable = true;
 
-  # --- Mounts für die alten HDD-ZFS-Pools ---
+  # --- Mounts für die HDD-ZFS-Pools ---
   fileSystems."/storage/backup" = { device = "safe/backup"; fsType = "zfs"; };
   fileSystems."/storage/media"  = { device = "extra/media"; fsType = "zfs"; };
 
