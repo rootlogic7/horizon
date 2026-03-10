@@ -46,20 +46,41 @@ let
     modules-right = [ "cpu" "memory" "backlight" "pulseaudio" "battery" ];
   } // modules;
 
-  # 3. DIE 3 MODI GENERIEREN
+  # --- QUASAR PROFILE ---
+  # Hauptmonitor (DP-1): Volle Top-Bar
+  mkTopBarQuasarMain = output: mkTopBar output;
+
+  # Zweitmonitor (HDMI-A-1): Abgespeckte Top-Bar (z.B. ohne Tray und Idle-Inhibitor)
+  mkTopBarQuasarSec = output: {
+    name = "topbar-sec";
+    layer = "top";
+    position = "top";
+    height = 20;
+    spacing = 4;
+    inherit output;
+    modules-left = [ "custom/nixos" "hyprland/workspaces" ];
+    modules-center = [ "hyprland/window" ];
+    modules-right = [ "clock" "custom/power" ]; # Reduziert
+  } // modules;
+
+  # 3. DIE MODI GENERIEREN
+  modeQuasar = [ (mkTopBarQuasarMain "DP-1") (mkTopBarQuasarSec "HDMI-A-1") ];
   modeLaptop      = [ (mkTopBar "eDP-1") (mkBottomBar "eDP-1") ];
   modeDocking     = [ (mkTopBar "DP-6")  (mkBottomBar "eDP-1") ];
   modeDockingOnly = [ (mkTopBar "DP-6")  (mkBottomBar "DP-6")  ];
 
-  # 4.a DAS INTELLIGENTE SWITCHER-SKRIPT (Gefixt)
+  # 4.a DAS INTELLIGENTE SWITCHER-SKRIPT (Erweitert für Quasar)
   barSwitcher = pkgs.writeShellScriptBin "statusbar-switcher" ''
-    # Nutzt pkill mit absolutem Pfad aus dem procps-Paket
     ${pkgs.procps}/bin/pkill -f waybar
-    # Warte kurz, um sicherzugehen, dass die Prozesse wirklich tot sind
     sleep 0.5
     MONITORS=$(${pkgs.hyprland}/bin/hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[].name')
-    # Wir starten waybar ebenfalls mit absolutem Pfad, um PATH-Probleme zu vermeiden
-    if echo "$MONITORS" | grep -q "DP-6" && echo "$MONITORS" | grep -q "eDP-1"; then
+    
+    # --- QUASAR LOGIK ---
+    if echo "$MONITORS" | grep -q "DP-1" && echo "$MONITORS" | grep -q "HDMI-A-1"; then
+      ${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-quasar -s ~/.config/waybar/style.css &
+    
+    # --- NOVA LOGIK ---
+    elif echo "$MONITORS" | grep -q "DP-6" && echo "$MONITORS" | grep -q "eDP-1"; then
       ${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-docking -s ~/.config/waybar/style.css &
     elif echo "$MONITORS" | grep -q "DP-6"; then
       ${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-docking-only -s ~/.config/waybar/style.css &
@@ -104,6 +125,7 @@ in {
   xdg.configFile."waybar/config-laptop".text = builtins.toJSON modeLaptop;
   xdg.configFile."waybar/config-docking".text = builtins.toJSON modeDocking;
   xdg.configFile."waybar/config-docking-only".text = builtins.toJSON modeDockingOnly;
+  xdg.configFile."waybar/config-quasar".text = builtins.toJSON modeQuasar;
 
   programs.waybar = {
     enable = true;
