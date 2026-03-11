@@ -12,14 +12,16 @@
     # System
     ../../system/default.nix
 
-    # Home
+    # Home Manager
     inputs.home-manager.nixosModules.home-manager
   ];
 
-  networking.hostName = "quasar";
-  networking.hostId = "8425e349";
+  networking = {
+    hostName = "quasar";
+    hostId = "8425e349";
+  };
 
-  # === SoC Opt-In Features aktivieren ===
+  # === SoC Opt-In Features ===
   horizon = {
     desktop.enable = true;
     desktop.monitors = [
@@ -35,7 +37,7 @@
     hardware.nvidia.enable = true;
   };
 
-  # === Home Manager Setup ===
+  # === Home Manager ===
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
