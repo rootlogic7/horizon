@@ -1,4 +1,3 @@
-# hosts/quasar/default.nix
 { config, pkgs, lib, inputs, ... }:
 
 {
