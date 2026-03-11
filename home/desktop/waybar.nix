@@ -4,7 +4,22 @@
 let
   theme = config.horizon.theme;
 
-  # 1. GEMEINSAME MODULE (Nur einmal definieren!)
+  # Hilfsfunktion, um Waybar CSS-Variablen zu generieren
+  mkWaybarColors = palette: ''
+    @define-color bg_alpha rgba(5, 5, 20, ${theme.ui.opacity});
+    @define-color bg #${palette.bg};
+    @define-color fg #${palette.fg};
+    @define-color accent_primary #${palette.accent_primary};
+    @define-color accent_secondary #${palette.accent_secondary};
+    @define-color accent_tertiary #${palette.accent_tertiary};
+    @define-color inactive #${palette.inactive_border};
+    @define-color text_white #${palette.term_reg_7};
+    @define-color status_green #${palette.term_reg_2};
+    @define-color status_orange #${palette.term_reg_3};
+    @define-color status_red #${palette.term_reg_1};
+  '';
+
+  # 1. GEMEINSAME MODULE
   modules = {
     "custom/nixos" = { format = ""; tooltip = false; };
     "hyprland/workspaces" = { format = "{icon}"; on-click = "activate"; format-icons = { active = ""; default = ""; }; };
@@ -21,143 +36,74 @@ let
     "battery" = { states = { warning = 30; critical = 15; }; format = "{icon} {capacity}%"; format-charging = " {capacity}%"; format-icons = ["" "" "" "" ""]; };
   };
 
-  # 2. TEMPLATES FÜR DIE LEISTEN
-  # --- NOVA PROFILE & DEFFAULT---
-  mkTopBar = output: {
-    name = "topbar";
-    layer = "top";
-    position = "top";
-    height = 20;
-    spacing = 4;
-    inherit output;
-    modules-left = [ "custom/nixos" "hyprland/workspaces" ];
-    modules-center = [ "hyprland/window" ];
-    modules-right = [ "idle_inhibitor" "tray" "clock" "custom/power" ];
-  } // modules;
-
-  mkBottomBar = output: {
-    name = "bottombar";
-    layer = "top";
-    position = "bottom";
-    height = 20;
-    spacing = 4;
-    inherit output;
-    modules-left = [ "network" ];
-    modules-center = [ ];
-    modules-right = [ "cpu" "memory" "backlight" "pulseaudio" "battery" ];
-  } // modules;
-
-  # --- QUASAR PROFILE ---
-  # Hauptmonitor (DP-1): Volle Top-Bar
+  # 2. TEMPLATES FÜR DIE LEISTEN (wie vorher)
+  mkTopBar = output: { name = "topbar"; layer = "top"; position = "top"; height = 20; spacing = 4; inherit output; modules-left = [ "custom/nixos" "hyprland/workspaces" ]; modules-center = [ "hyprland/window" ]; modules-right = [ "idle_inhibitor" "tray" "clock" "custom/power" ]; } // modules;
+  mkBottomBar = output: { name = "bottombar"; layer = "top"; position = "bottom"; height = 20; spacing = 4; inherit output; modules-left = [ "network" ]; modules-center = [ ]; modules-right = [ "cpu" "memory" "backlight" "pulseaudio" "battery" ]; } // modules;
   mkTopBarQuasarMain = output: mkTopBar output;
-
-  # Quasar Bottom-Bar: Wie Nova, aber ohne Backlight und Batterie
-  mkBottomBarQuasar = output: {
-    name = "bottombar-quasar";
-    layer = "top";
-    position = "bottom";
-    height = 20;
-    spacing = 4;
-    inherit output;
-    modules-left = [ "network" ];
-    modules-center = [ ];
-    modules-right = [ "cpu" "memory" "pulseaudio" ]; 
-  } // modules;
-
-  # Quasar Zweit-Monitor Top-Bar: Hardware-Module wandern nach oben
-  mkTopBarQuasarSec = output: {
-    name = "topbar-quasar-sec";
-    layer = "top";
-    position = "top";
-    height = 20;
-    spacing = 4;
-    inherit output;
-    modules-left = [ "network" ];
-    modules-center = [ ];
-    modules-right = [ "cpu" "memory" "pulseaudio" ]; 
-  } // modules;
+  mkBottomBarQuasar = output: { name = "bottombar-quasar"; layer = "top"; position = "bottom"; height = 20; spacing = 4; inherit output; modules-left = [ "network" ]; modules-center = [ ]; modules-right = [ "cpu" "memory" "pulseaudio" ]; } // modules;
+  mkTopBarQuasarSec = output: { name = "topbar-quasar-sec"; layer = "top"; position = "top"; height = 20; spacing = 4; inherit output; modules-left = [ "network" ]; modules-center = [ ]; modules-right = [ "cpu" "memory" "pulseaudio" ]; } // modules;
 
   # 3. DIE MODI GENERIEREN
   modeLaptop      = [ (mkTopBar "eDP-1") (mkBottomBar "eDP-1") ];
   modeDocking     = [ (mkTopBar "DP-6")  (mkBottomBar "eDP-1") ];
   modeDockingOnly = [ (mkTopBar "DP-6")  (mkBottomBar "DP-6")  ];
-
-  # Quasar (Workstation)
   modeQuasarSingle = [ (mkTopBar "DP-1") (mkBottomBarQuasar "DP-1") ];
   modeQuasarDual   = [ (mkTopBar "DP-1") (mkTopBarQuasarSec "HDMI-A-1") ];
 
-  # 4. DAS INTELLIGENTE SWITCHER-SKRIPT (Erweitert)
+  # 4. DAS INTELLIGENTE SWITCHER-SKRIPT
   barSwitcher = pkgs.writeShellScriptBin "statusbar-switcher" ''
-    ${pkgs.procps}/bin/pkill -f waybar
+    ${pkgs.procps}/bin/pkill waybar || true
     sleep 0.5
-    MONITORS=$(${pkgs.hyprland}/bin/hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[].name')
     
-    # --- QUASAR LOGIK (Workstation) ---
-    # Wenn DP-1 UND HDMI-A-1 aktiv sind: Dual-Monitor Modus (Zwei Top-Bars)
-    if echo "$MONITORS" | grep -q "DP-1" && echo "$MONITORS" | grep -q "HDMI-A-1"; then
-      ${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-quasar-dual -s ~/.config/waybar/style.css &
+    # Hole Monitore und wandle sie in eine Liste um, die durch Leerzeichen getrennt ist.
+    # WICHTIG: Wir setzen am Anfang und Ende auch ein Leerzeichen!
+    MONITORS=$(${pkgs.hyprland}/bin/hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[].name' || echo "")
+    MONITORS_FLAT=" $(echo $MONITORS | tr '\n' ' ') "
     
-    # Wenn NUR DP-1 aktiv ist: Single-Monitor Modus (Top & Bottom Bar)
-    elif echo "$MONITORS" | grep -q "DP-1"; then
-      ${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-quasar-single -s ~/.config/waybar/style.css &
+    CONF_DIR="${config.home.homeDirectory}/.config/waybar"
     
-    # --- NOVA LOGIK (Laptop) ---
-    elif echo "$MONITORS" | grep -q "DP-6" && echo "$MONITORS" | grep -q "eDP-1"; then
-      ${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-docking -s ~/.config/waybar/style.css &
-    elif echo "$MONITORS" | grep -q "DP-6"; then
-      ${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-docking-only -s ~/.config/waybar/style.css &
+    # Strikte Prüfung: " DP-1 " anstatt nur *"DP-1"*, weil sonst "eDP-1" fälschlicherweise triggert!
+    if [[ "$MONITORS_FLAT" == *" DP-1 "* && "$MONITORS_FLAT" == *" HDMI-A-1 "* ]]; then
+      CFG="$CONF_DIR/config-quasar-dual"
+    elif [[ "$MONITORS_FLAT" == *" DP-1 "* ]]; then
+      CFG="$CONF_DIR/config-quasar-single"
+    elif [[ "$MONITORS_FLAT" == *" DP-6 "* && "$MONITORS_FLAT" == *" eDP-1 "* ]]; then
+      CFG="$CONF_DIR/config-docking"
+    elif [[ "$MONITORS_FLAT" == *" DP-6 "* ]]; then
+      CFG="$CONF_DIR/config-docking-only"
     else
-      ${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-laptop -s ~/.config/waybar/style.css &
+      # Wenn nichts anderes exakt passt, nimm den Standard-Laptop-Modus
+      CFG="$CONF_DIR/config-laptop"
     fi
+
+    # Waybar entkoppelt im Hintergrund starten (ohne Terminal-Spam)
+    ${pkgs.waybar}/bin/waybar -c "$CFG" -s "$CONF_DIR/style.css" > /dev/null 2>&1 &
+    disown
   '';
 
-  # 4.b NEU: DER VERBESSERTE EVENT-LISTENER
-  #barListener = pkgs.writeShellScriptBin "statusbar-listener" ''
-  #  # 1. WICHTIG: Warte 2 Sekunden nach dem Hyprland-Start, 
-  #  # damit Monitore und Sockets zu 100% bereit sind.
-  #  sleep 2
-  #  # 2. Führe das initiale Setup für den aktuellen Monitor-Zustand aus
-  #  ${barSwitcher}/bin/statusbar-switcher
-  #  # 3. Lausche auf Events (mit einer Endlosschleife, falls socat mal abbricht)
-  #  SOCKET="UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock"
-  #  while true; do
-  #    ${pkgs.socat}/bin/socat -U - $SOCKET | while read -r line; do
-  #      if [[ "$line" == "monitoradded"* ]] || [[ "$line" == "monitorremoved"* ]]; then
-  #        # Kurze Verzögerung, damit Hyprland den neuen Monitor registrieren kann, 
-  #        # bevor der Switcher die neuen Daten abfragt
-  #        sleep 1
-  #        ${barSwitcher}/bin/statusbar-switcher
-  #      fi
-  #    done
-  #    # Falls socat crasht, warte 1 Sekunde und starte es neu
-  #    sleep 1
-  #  done
-  #'';
-
 in {
-  # Wir fügen unser neues Skript und jq (zum JSON-Parsen) den Paketen hinzu
   home.packages = [
     barSwitcher
-    # barListener
     pkgs.jq
-    # pkgs.socat 
   ];
 
-  # Die Konfigurationsdateien in ~/.config/waybar/ schreiben
+  # Schreibe die Farb-Definitionen als CSS in den Store
+  xdg.configFile."horizon/themes/dark/waybar-colors.css".text = mkWaybarColors theme.palettes.dark;
+  xdg.configFile."horizon/themes/light/waybar-colors.css".text = mkWaybarColors theme.palettes.light;
+
   xdg.configFile."waybar/config-laptop".text = builtins.toJSON modeLaptop;
   xdg.configFile."waybar/config-docking".text = builtins.toJSON modeDocking;
   xdg.configFile."waybar/config-docking-only".text = builtins.toJSON modeDockingOnly;
-
   xdg.configFile."waybar/config-quasar-single".text = builtins.toJSON modeQuasarSingle;
   xdg.configFile."waybar/config-quasar-dual".text = builtins.toJSON modeQuasarDual;
 
   programs.waybar = {
     enable = true;
-    # systemd aus, da unser Skript das Starten übernimmt
     systemd.enable = false;
-    
-    # Das Styling (genau mit deinen gewünschten px-Werten!)
     style = ''
+      /* NEU: Importiere die dynamischen Farben */
+      @import "${config.home.homeDirectory}/.config/horizon/themes/current/waybar-colors.css";
+
       * {
           border: none;
           border-radius: 0;
@@ -167,39 +113,40 @@ in {
       }
 
       window#waybar {
-          background-color: rgba(5, 5, 20, ${theme.ui.opacity});
-          color: #${theme.colors.fg};
+          background-color: @bg_alpha;
+          color: @fg;
       }
 
       window#waybar.topbar {
-          border-bottom: ${toString theme.ui.border_size}px solid #${theme.colors.pink};
+          border-bottom: ${toString theme.ui.border_size}px solid @accent_primary;
       }
 
       window#waybar.bottombar {
-          border-top: ${toString theme.ui.border_size}px solid #${theme.colors.cyan};
+          border-top: ${toString theme.ui.border_size}px solid @accent_tertiary;
       }
 
       #workspaces button, #clock, #battery, #network, #pulseaudio, 
       #backlight, #memory, #cpu, #tray, #idle_inhibitor, #custom-power, #custom-nixos {
           padding: 1px 3px;
           margin: 1px 4px;
-          color: #${theme.colors.white};
+          color: @text_white;
       }
 
       #window {
           font-size: 11px;
           padding: 1px 3px;
           margin: 1px 4px;
-          color: #${theme.colors.cyan};
+          color: @accent_tertiary;
           font-weight: bold;
       }
 
-      #workspaces button { color: #${theme.colors.inactive}; }
-      #workspaces button.active { color: #${theme.colors.pink}; font-weight: bold; }
+      #workspaces button { color: @inactive; }
+      #workspaces button.active { color: @accent_primary; font-weight: bold; }
 
-      #battery.charging { color: #${theme.colors.green}; }
-      #battery.warning:not(.charging) { color: #${theme.colors.orange}; }
-      #battery.critical:not(.charging) { color: #${theme.colors.red}; animation: blink 2s linear infinite; }
+      #battery.charging { color: @status_green; }
+      #battery.warning:not(.charging) { color: @status_orange; }
+      #battery.critical:not(.charging) { color: @status_red; animation: blink 2s linear infinite; }
+      
       @keyframes blink { 50% { opacity: 0.3; } }
     '';
   };

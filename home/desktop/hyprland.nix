@@ -4,21 +4,40 @@
 let
   theme = config.horizon.theme;
   isNvidia = osConfig.horizon.hardware.nvidia.enable or false;
+
+  # Hilfsfunktion, um die Hyprland-Farbvariablen zu generieren
+  mkHyprlandColors = palette: ''
+    $bg = rgb(${palette.bg})
+    $accent_primary = rgb(${palette.accent_primary})
+    $accent_secondary = rgb(${palette.accent_secondary})
+    $accent_tertiary = rgb(${palette.accent_tertiary})
+    $inactive_border = rgb(${palette.inactive_border})
+    # Die Schattenfarbe braucht einen Alpha-Wert (44 in Hex = ca. 26% transparent)
+    $shadow_color = rgba(${palette.accent_secondary}44)
+  '';
+
 in {
+  # 1. Wir schreiben die Farbdateien in den XDG-Config Ordner
+  xdg.configFile."horizon/themes/dark/hyprland-colors.conf".text = mkHyprlandColors theme.palettes.dark;
+  xdg.configFile."horizon/themes/light/hyprland-colors.conf".text = mkHyprlandColors theme.palettes.light;
+
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {
       
+      # NEU: Lade die Farben dynamisch aus dem aktuellen Theme-Symlink
+      source = "~/.config/horizon/themes/current/hyprland-colors.conf";
+
       # 1. Monitore
       monitor = osConfig.horizon.desktop.monitors;
 
-      # 2. Tastatur & Touchpad (Laptop-Optimierungen)
+      # 2. Tastatur & Touchpad
       input = {
         kb_layout = "de";
         kb_variant = "nodeadkeys";
         follow_mouse = 1;
         touchpad = {
-          natural_scroll = true; # Fühlt sich auf Laptops deutlich besser an
+          natural_scroll = true;
         };
       };
 
@@ -31,7 +50,6 @@ in {
         "XCURSOR_THEME,phinger-cursors-light"
         "XCURSOR_SIZE,24"
       ] ++ lib.optionals isNvidia [
-        # Hyprland-spezifische Envs für Nvidia
         "LIBVA_DRIVER_NAME,nvidia"
         "XDG_SESSION_TYPE,wayland"
         "GBM_BACKEND,nvidia-drm"
@@ -39,8 +57,8 @@ in {
       ];
 
       exec-once = [
-        "${pkgs.swaybg}/bin/swaybg -i ${./wallpaper.jpg} -m fill"
-        #        "statusbar-listener"
+        # NEU: swaybg nutzt jetzt immer das Wallpaper aus dem aktuellen Theme-Ordner!
+        "${pkgs.swaybg}/bin/swaybg -i ~/.config/horizon/themes/current/wallpaper -m fill"
       ];
 
       # 4. Design & Layout
@@ -49,16 +67,16 @@ in {
         gaps_out = 12;
         border_size = theme.ui.border_size;
         
-        # Ein 3-Farb-Gradient: Pink -> Orange -> Cyan
-        "col.active_border" = "rgb(${theme.colors.pink}) rgb(${theme.colors.orange}) rgb(${theme.colors.cyan}) 45deg";
-        "col.inactive_border" = "rgb(${theme.colors.inactive})";
+        # Nutzen jetzt die dynamischen $ Variablen!
+        "col.active_border" = "$accent_primary $accent_secondary $accent_tertiary 45deg";
+        "col.inactive_border" = "$inactive_border";
         
         layout = "dwindle";
       };
 
       decoration = {
         rounding = theme.ui.rounding;
-        
+
         blur = {
           enabled = true;
           size = theme.ui.blur_size;
@@ -67,33 +85,31 @@ in {
           new_optimizations = true;
         };
 
-        # NEU: Die korrekte moderne Hyprland-Syntax für Schatten
         shadow = {
           enabled = true;
           range = 15;
           render_power = 2;
-          color = "rgba(${theme.colors.orange}44)";
+          color = "$shadow_color"; # Dynamische Schattenfarbe
         };
       };
-      
+
       animations = {
         enabled = true;
         bezier = [
           "neon, 0.05, 0.9, 0.1, 1.05"
           "smooth, 0.25, 1, 0.5, 1"
-          "linear, 0.0, 0.0, 1.0, 1.0" # NEU: Für die Endlos-Rotation
+          "linear, 0.0, 0.0, 1.0, 1.0"
         ];
         animation = [
           "windows, 1, 5, neon, slide"
           "windowsOut, 1, 4, smooth, slide"
           "border, 1, 10, default"
-          "borderangle, 1, 50, linear, loop" # NEU: Die Farben im Rahmen drehen sich endlos!
+          "borderangle, 1, 50, linear, loop"
           "fade, 1, 5, smooth"
           "workspaces, 1, 6, default"
         ];
       };
 
-      # Hardware-Cursor-Fix für Nvidia
       cursor = lib.mkIf isNvidia {
         no_hardware_cursors = true;
       };
@@ -101,17 +117,18 @@ in {
       misc = {
         disable_hyprland_logo = true;
         force_default_wallpaper = 0;
-        vrr = 1; # Variable Refresh Rate - hilft auf dem Laptop massiv beim Akkusparen!
+        vrr = 1;
       };
 
       # 6. Window- und Layer-Rules
       layerrule = [
-        "blur on, match:namespace waybar"        # Macht den Hintergrund der Waybar unscharf
-        "ignore_alpha 0, match:namespace waybar" # 'ignorezero' heißt jetzt 'ignore_alpha 0'
+        "blur on, match:namespace waybar"
+        "ignore_alpha 0, match:namespace waybar"
       ];
+
       windowrule = [
         "float on, match:class ^(fuzzel)$"
-        "float on, match:title ^(Picture-in-Picture)$" # Wichtig für YouTube-Minifenster
+        "float on, match:title ^(Picture-in-Picture)$"
       ];
 
       # 7. Binds
@@ -138,10 +155,9 @@ in {
         "$mod SHIFT, 2, movetoworkspace, 2"
       ];
 
-      # NEU: Maus-Binds (Erlaubt dir, Fenster mit Super + Mausklick zu verschieben/skalieren)
       bindm = [
-        "$mod, mouse:272, movewindow"   # Linke Maustaste
-        "$mod, mouse:273, resizewindow" # Rechte Maustaste
+        "$mod, mouse:272, movewindow"
+        "$mod, mouse:273, resizewindow"
       ];
 
       bindl = [
