@@ -10,6 +10,11 @@ in {
   };
 
   config = mkIf cfg.enable {
+    nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+      "nvidia-x11"
+      "nvidia-settings"
+    ];
+
     # 1. Grafik-Treiber aktivieren (hardware.opengl heißt in neueren NixOS-Versionen hardware.graphics)
     hardware.graphics = {
       enable = true;
