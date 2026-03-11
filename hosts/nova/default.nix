@@ -1,26 +1,26 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
-  # System
   system.stateVersion = "25.11";
 
-  # Imports
-  imports = [ 
+  imports = [
+    # Hardware
     ./hardware-configuration.nix
     ./disko.nix
     inputs.disko.nixosModules.disko
     
-    # Unsere gebündelten System-Module
+    # System
     ../../system/default.nix
 
-    # Home-Manager direkt im Host einbinden
+    # Home Manager
     inputs.home-manager.nixosModules.home-manager
   ];
 
-  # Networking
-  networking.hostName = "nova";
+  networking = {
+    hostName = "nova";
+  };
 
-  # === NEU: SoC Opt-In Features aktivieren ===
+  # === SoC Opt-In Features ===
   horizon = {
     desktop.enable = true;
     desktop.monitors = [
