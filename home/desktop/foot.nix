@@ -15,7 +15,7 @@ in {
         font = "${theme.ui.font}:size=12";
       };
       
-      colors = {
+      colors-dark = {
         alpha = theme.ui.opacity;
         background = theme.colors.bg;
         foreground = theme.colors.fg;

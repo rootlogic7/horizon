@@ -40,9 +40,8 @@
       # Keine manuellen Init-Skripte mehr nötig für Zoxide/Starship!
       # Fastfetch wird hier beim Start ausgeführt
       extraConfig = ''
-        $env.config = {
-          show_banner: false,
-        }
+        $env.config.show_banner = false
+
         # Fastfetch beim Start anzeigen
         fastfetch
       '';
