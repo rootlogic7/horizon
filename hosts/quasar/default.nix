@@ -48,6 +48,7 @@
       imports = [
         inputs.catppuccin.homeModules.catppuccin
         ../../home/haku.nix
+        ../../skins/kawaii.nix
       ];
     };
   };
