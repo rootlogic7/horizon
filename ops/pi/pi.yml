@@ -43,7 +43,7 @@
       ansible.posix.authorized_key:
         user: root
         state: present
-        key: "{{ lookup('file', '~/.ssh/id_ed25519_main.pub') }}"
+        key: "{{ lookup('file', 'authorized_keys') }}"
         exclusive: yes
       notify: "lbu commit"
 
