@@ -19,6 +19,18 @@
       };
     };
 
+    ssh = {
+      enable = true;
+      matchBlocks = {
+        "github.com" = {
+          host = "github.com";
+          user = "git";
+          identityFile = "~/.ssh/id_ed25519_main";
+          identitiesOnly = true;
+        };
+      };
+    };
+
     gpg.enable = true;
     
     password-store = {
