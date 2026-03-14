@@ -49,7 +49,7 @@
       imports = [
         #inputs.catppuccin.homeModules.catppuccin
         ../../home/haku.nix
-        #../../skins/custom.nix
+        ../../skins/template.nix
       ];
     };
   };
