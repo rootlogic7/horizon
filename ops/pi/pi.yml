@@ -4,11 +4,16 @@
   gather_facts: false
 
   handlers:
+    - name: activate awall
+      # Nutze async, damit Ansible nicht hängen bleibt, falls die SSH-Verbindung kurz zuckt
+      ansible.builtin.shell: awall activate -f
+      async: 10
+      poll: 0
+
     - name: save alpine state
       ansible.builtin.command: lbu commit -d
       listen: "lbu commit"
 
-    # NEU: Handler, um den SSH-Dienst nach Änderungen neu zu starten
     - name: restart sshd
       ansible.builtin.service:
         name: sshd
@@ -42,7 +47,7 @@
         exclusive: yes
       notify: "lbu commit"
 
-    # --- NEU: SSH Härten ---
+    # --- SSH Härten ---
     - name: Disable SSH password authentication
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -61,7 +66,7 @@
         - restart sshd
         - lbu commit
 
-    # --- NEU: Daten-Partition mounten ---
+    # --- Daten-Partition mounten ---
     - name: Mount data partition and add to fstab
       ansible.posix.mount:
         path: /mnt/data
@@ -69,3 +74,41 @@
         fstype: ext4
         state: mounted
       notify: "lbu commit"
+
+    # --- NEU: awall Firewall ---
+    - name: Install awall and iptables
+      community.general.apk:
+        name:
+          - awall
+          - iptables
+          - ip6tables
+        state: present
+      notify: "lbu commit"
+
+    - name: Enable iptables service on boot
+      ansible.builtin.service:
+        name: iptables
+        enabled: yes
+      notify: "lbu commit"
+
+    - name: Configure awall base policy
+      ansible.builtin.copy:
+        dest: /etc/awall/private/server.json
+        content: |
+          {
+            "description": "Single Node Server Firewall",
+            "zone": {
+              "ext": { "iface": "eth0" }
+            },
+            "policy": [
+              { "in": "ext", "action": "drop" },
+              { "action": "accept" }
+            ],
+            "filter": [
+              { "in": "ext", "service": ["ssh", "ping"], "action": "accept" }
+            ]
+          }
+        mode: '0644'
+      notify: 
+        - activate awall
+        - lbu commit
