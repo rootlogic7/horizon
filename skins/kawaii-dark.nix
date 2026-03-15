@@ -29,7 +29,7 @@
   horizon.theme.colors = {
     # --- BASIS-FARBEN (Hex-Werte ohne '#') ---
     bg = "1a1523";        # Hintergrund - Midnight Plum
-    fg = "e0e0e0";        # Textfarbe (Weiß/Hellgrau)
+    fg = "fce4ec";        # Textfarbe - Rosewater
     cursor = "ffffff";    # Cursor-Farbe
     
     # --- UI AKZENTE (Graustufen als Startpunkt) ---
