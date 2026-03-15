@@ -8,13 +8,13 @@ in {
     
     # NEU: Wir injecten reines Lua, um den Hintergrund je nach Skin-Wahl anzupassen
     extraConfigLua = if theme.ui.nixvim_transparent then ''
-      vim.cmd [[highlight Normal guibg=NONE ctermbg=NONE]]
-      vim.cmd [[highlight NormalNC guibg=NONE ctermbg=NONE]]
-      vim.cmd [[highlight EndOfBuffer guibg=NONE ctermbg=NONE]]
+      vim.cmd [[highlight Normal guifg=#${theme.colors.fg} guibg=NONE ctermbg=NONE]]
+      vim.cmd [[highlight NormalNC guifg=#${theme.colors.fg} guibg=NONE ctermbg=NONE]]
+      vim.cmd [[highlight EndOfBuffer guifg=#${theme.colors.fg} guibg=NONE ctermbg=NONE]]
     '' else ''
-      vim.cmd [[highlight Normal guibg=#${theme.colors.bg}]]
-      vim.cmd [[highlight NormalNC guibg=#${theme.colors.bg}]]
-      vim.cmd [[highlight EndOfBuffer guibg=#${theme.colors.bg}]]
+      vim.cmd [[highlight Normal guifg=#${theme.colors.fg} guibg=#${theme.colors.bg}]]
+      vim.cmd [[highlight NormalNC guifg=#${theme.colors.fg} guibg=#${theme.colors.bg}]]
+      vim.cmd [[highlight EndOfBuffer guifg=#${theme.colors.fg} guibg=#${theme.colors.bg}]]
     '';
 
     # Grundeinstellungen für eine moderne IDE

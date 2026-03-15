@@ -23,6 +23,17 @@ in {
         description = "Macht den Neovim Hintergrund transparent (Nutzt Terminal-Hintergrund)"; 
       };
 
+      fastfetch_logo = mkOption { 
+        type = types.str; 
+        default = "nixos"; 
+      };
+
+      fastfetch_color = mkOption { 
+        type = types.str; 
+        default = "magenta"; 
+        description = "Die ANSI-Farbe (z.B. 'magenta', 'cyan', 'blue') für Fastfetch";
+      };
+
     };
 
     colors = {
@@ -187,9 +198,11 @@ in {
             --lwt-accent-color: #${cfg.colors.bg} !important;
             --tab-selected-bgcolor: #${cfg.colors.bg} !important;
             --lwt-text-color: #${cfg.colors.fg} !important;
+            --toolbar-color: #${cfg.colors.fg} !important;
           }
           #navigator-toolbox {
             background-color: #${cfg.colors.bg} !important;
+            color: #${cfg.colors.fg} !important;
             border-bottom: none !important;
           }
         '';
@@ -199,10 +212,50 @@ in {
           @-moz-document url("about:blank"), url("about:newtab"), url("about:home") {
             body {
               background-color: #${cfg.colors.bg} !important;
+              color: #${cfg.colors.fg} !important;
             }
           }
         '';
       };
     };
+
+    programs.fastfetch = {
+      enable = true;
+      settings = {
+        logo = {
+          source = cfg.ui.fastfetch_logo;
+          padding = {
+            top = 1;
+            right = 2;
+            left = 2;
+          };
+        };
+        display = {
+          separator = "   "; # Ein schicker Pfeil aus dem Nerd Font
+          color = {
+            keys = cfg.ui.fastfetch_color;  
+            title = cfg.ui.fastfetch_color;
+          };
+        };
+        # Hier definieren wir, was angezeigt werden soll (schön kompakt)
+        modules = [
+          "title"
+          "separator"
+          "os"
+          "host"
+          "kernel"
+          "uptime"
+          "packages"
+          "shell"
+          "wm"
+          "terminal"
+          "memory"
+          "break"
+          "colors" # Zeigt am Ende deine hübsche neue Farbpalette!
+        ];
+      };
+    };
+
+
   };
 }

@@ -24,6 +24,8 @@
     border_size = 2;      # Rahmendicke für Fenster und Fuzzel
     blur_size = 0;        # Stärke des Hintergrund-Blurs in Hyprland
     nixvim_transparent = false; # Nixvim background opacity toggle
+    fastfetch_logo = "nixos_small"; # Alternativen: fastfetch --print-logos
+    fastfetch_color = "magenta";
   };
 
   horizon.theme.colors = {

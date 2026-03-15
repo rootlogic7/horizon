@@ -8,13 +8,12 @@
     ripgrep
     fd
     bottom
-    # fastfetch wurde hier entfernt, da es unten als eigenes Programm geladen wird
     starship
   ];
 
-  programs.fastfetch = {
-    enable = true;
-  };
+  #programs.fastfetch = {
+  #  enable = true;
+  #};
 
   programs = {
     # Nushell Konfiguration
