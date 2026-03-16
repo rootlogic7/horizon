@@ -299,8 +299,7 @@
           pidfile="/run/gitea.pid"
           command="/bin/su"
           # Gitea läuft auf Port 3000 (HTTP) und wir mappen den internen SSH-Port (22) auf 2222 nach außen.
-          # USER_UID und USER_GID stellen sicher, dass Gitea intern die Rechte sauber setzt.
-          command_args="-l podman_user -c 'export XDG_RUNTIME_DIR=/home/podman_user/.run; podman run --rm --name gitea -p 3000:3000 -p 2222:22 -e USER_UID=100000 -e USER_GID=100000 -v /mnt/data/gitea:/data docker.io/gitea/gitea:latest'"
+          command_args="-l podman_user -c 'export XDG_RUNTIME_DIR=/home/podman_user/.run; podman run --rm --name gitea -p 3000:3000 -p 2222:22 -v /mnt/data/gitea:/data docker.io/gitea/gitea:latest'"
           command_background="yes"
           
           depend() {
