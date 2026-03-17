@@ -5,10 +5,7 @@
 
   handlers:
     - name: activate awall
-      # Nutze async, damit Ansible nicht hängen bleibt, falls die SSH-Verbindung kurz zuckt
-      ansible.builtin.shell: awall activate -f
-      async: 10
-      poll: 0
+      ansible.builtin.command: awall activate -f
 
     - name: save alpine state
       ansible.builtin.command: lbu commit -d
@@ -48,6 +45,18 @@
         update_cache: yes
       notify: "lbu commit"
 
+    - name: Install chrony for time synchronization
+      community.general.apk:
+        name: chrony
+        state: present
+      notify: "lbu commit"
+
+    - name: Enable and start chronyd service
+      ansible.builtin.service:
+        name: chronyd
+        enabled: yes
+        state: started
+
     - name: Enforce strictly allowed SSH keys for root
       ansible.posix.authorized_key:
         user: root
@@ -81,6 +90,7 @@
         path: /mnt/data
         src: /dev/mmcblk0p2
         fstype: ext4
+        opts: defaults,noatime
         state: mounted
       notify: "lbu commit"
 
@@ -220,6 +230,11 @@
         regexp: '^podman_user:'
         line: 'podman_user:100000:65536'
         create: yes
+      notify: "lbu commit"
+
+    - name: Exclude Podman storage from lbu backups
+      ansible.builtin.command: lbu exclude /home/podman_user/.local/share/containers
+      changed_when: false
       notify: "lbu commit"
 
     # --- Schritt 3: Persistenz & Rechte ---
