@@ -126,7 +126,6 @@
             ],
             "filter": [
               { "in": "ext", "service": ["ssh", "ping"], "action": "accept" },
-              { "in": "ext", "port": ["22000/tcp", "22000/udp", "21027/udp", "8384/tcp"], "action": "accept" },
               { "in": "ext", "port": ["3000/tcp", "2222/tcp"], "action": "accept" },
               { "in": "ext", "port": ["53/tcp", "53/udp", "3001/tcp", "8080/tcp"], "action": "accept" }
             ]
@@ -238,14 +237,6 @@
       notify: "lbu commit"
 
     # --- Schritt 3: Persistenz & Rechte ---
-    - name: Create persistent Syncthing data directory
-      ansible.builtin.file:
-        path: /mnt/data/syncthing
-        state: directory
-        owner: podman_user
-        group: podman
-        mode: '0755'
-      notify: "lbu commit"
 
     # Da Rootless Podman eine Laufzeitumgebung (XDG_RUNTIME_DIR) braucht,
     # legen wir dem User ein lokales Run-Verzeichnis an.
@@ -286,41 +277,6 @@
       notify: "lbu commit"
 
     # --- Schritt 4: OpenRC Auto-Start Skript ---
-    - name: Create OpenRC init script for Syncthing
-      ansible.builtin.copy:
-        dest: /etc/init.d/syncthing
-        mode: '0755'
-        content: |
-          #!/sbin/openrc-run
-          
-          name="Syncthing (Rootless Podman)"
-          description="Runs Syncthing in a rootless container"
-          
-          # Wir nutzen su, um den Befehl als podman_user auszuführen.
-          # Das --rm sorgt dafür, dass alte Container-Reste beim Neustart gelöscht werden.
-          pidfile="/run/syncthing.pid"
-          command="/bin/su"
-          command_args="-l podman_user -c 'export XDG_RUNTIME_DIR=/home/podman_user/.run; podman run --rm --name syncthing -p 8384:8384 -p 22000:22000/tcp -p 22000:22000/udp -p 21027:21027/udp -v /mnt/data/syncthing:/var/syncthing docker.io/syncthing/syncthing:latest'"
-          command_background="yes"
-          
-          depend() {
-              need net localmount
-              after firewall
-          }
-          
-          stop_pre() {
-              ebegin "Stopping rootless podman container: syncthing"
-              su -l podman_user -c "export XDG_RUNTIME_DIR=/home/podman_user/.run; podman stop syncthing"
-              eend $?
-          }
-      notify: "lbu commit"
-
-    - name: Enable and start Syncthing OpenRC service
-      ansible.builtin.service:
-        name: syncthing
-        enabled: yes
-        state: started
-
     # --- Gitea: Persistenz & Rechte ---
     - name: Create persistent Gitea data directory
       ansible.builtin.file:
