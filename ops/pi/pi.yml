@@ -27,8 +27,14 @@
 
   pre_tasks:
     - name: Bootstrap Python for Ansible
-      ansible.builtin.raw: apk add --no-cache python3
+      ansible.builtin.raw: apk add --no-cache python3 || true
       changed_when: false
+
+    - name: Ensure reliable fallback DNS is present
+      ansible.builtin.lineinfile:
+        path: /etc/resolv.conf
+        line: "nameserver 1.1.1.1"
+        insertbefore: BOF
       
     - name: Gather facts explicitly
       ansible.builtin.setup:
@@ -191,11 +197,12 @@
       notify: "lbu commit"
 
     # --- Rootless Podman: Basis-Pakete & Cgroups ---
-    - name: Install Podman, Compose and rootless dependencies
+    - name: Install Podman, Compose, TUI and rootless dependencies
       community.general.apk:
         name:
           - podman
-          - podman-compose   # <-- NEU hinzugefügt
+          - podman-compose
+          - podman-tui       # <-- NEU: Dashboard-Tool
           - shadow           
           - fuse-overlayfs   
           - slirp4netns      
@@ -224,7 +231,18 @@
         group: podman
         shell: /bin/ash
         create_home: yes
-        home: /home/podman_user
+        home: /mnt/data/podman_user
+      notify: "lbu commit"
+
+    - name: Add XDG_RUNTIME_DIR to podman_user profile
+      ansible.builtin.lineinfile:
+        path: /mnt/data/podman_home/.profile
+        regexp: '^export XDG_RUNTIME_DIR='
+        line: 'export XDG_RUNTIME_DIR=/tmp/podman_run'  # <-- Ab in den RAM damit!
+        create: yes
+        owner: podman_user
+        group: podman
+        mode: '0644'
       notify: "lbu commit"
 
     - name: Define subuid for podman_user
@@ -241,11 +259,6 @@
         regexp: '^podman_user:'
         line: 'podman_user:100000:65536'
         create: yes
-      notify: "lbu commit"
-
-    - name: Exclude Podman storage from lbu backups
-      ansible.builtin.command: lbu exclude /home/podman_user/.local/share/containers
-      changed_when: false
       notify: "lbu commit"
 
     # --- Persistenz & Rechte ---
@@ -265,7 +278,7 @@
 
     - name: Create local run directory for podman_user
       ansible.builtin.file:
-        path: /home/podman_user/.run
+        path: /mnt/data/podman_user/.run
         state: directory
         owner: podman_user
         group: podman
@@ -286,7 +299,7 @@
       ansible.builtin.command: sysctl -p /etc/sysctl.d/99-rootless.conf
       changed_when: false
 
-    # --- NEU: Podman Compose Setup ---
+    # --- Podman Compose Setup & API ---
     - name: Deploy docker-compose.yml
       ansible.builtin.copy:
         dest: /mnt/data/docker-compose.yml
@@ -332,30 +345,46 @@
                 - /mnt/data/adguard/conf:/opt/adguardhome/conf
       notify: "lbu commit"
 
-    - name: Create OpenRC init script for podman-compose
+    - name: Create OpenRC init script for containers and API
       ansible.builtin.copy:
         dest: /etc/init.d/containers
         mode: '0755'
         content: |
           #!/sbin/openrc-run
           
-          name="Podman Compose Containers"
-          description="Runs rootless containers via podman-compose"
+          name="Podman Compose & API"
+          description="Runs rootless Podman API and containers"
           
           depend() {
               need net localmount
-              after firewall
+              use chronyd
+              after firewall chronyd
           }
           
           start() {
+              ebegin "Syncing time (crucial for Raspberry Pi without RTC)"
+              # Zwingt den Pi, die Uhrzeit sofort abzugleichen, BEVOR Podman startet
+              chronyc makestep || true
+              
+              ebegin "Preparing volatile runtime directory in RAM"
+              # Legt das Verzeichnis im flüchtigen RAM (/tmp) an, löst den Boot-ID Fehler für immer
+              mkdir -p /tmp/podman_run
+              chown podman_user:podman /tmp/podman_run
+              
+              ebegin "Starting Podman API daemon"
+              su -l podman_user -c "export XDG_RUNTIME_DIR=/tmp/podman_run; podman system service -t 0 &"
+              
               ebegin "Starting containers via podman-compose"
-              su -l podman_user -c "export XDG_RUNTIME_DIR=/home/podman_user/.run; podman-compose -f /mnt/data/docker-compose.yml up -d"
+              su -l podman_user -c "export XDG_RUNTIME_DIR=/tmp/podman_run; podman-compose -f /mnt/data/docker-compose.yml up -d"
               eend $?
           }
           
           stop() {
               ebegin "Stopping containers via podman-compose"
-              su -l podman_user -c "export XDG_RUNTIME_DIR=/home/podman_user/.run; podman-compose -f /mnt/data/docker-compose.yml down"
+              su -l podman_user -c "export XDG_RUNTIME_DIR=/tmp/podman_run; podman-compose -f /mnt/data/docker-compose.yml down"
+              
+              ebegin "Stopping Podman API daemon"
+              pkill -u podman_user podman || true
               eend $?
           }
       notify: "lbu commit"
