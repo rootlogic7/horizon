@@ -6,6 +6,7 @@
   handlers:
     - name: activate awall
       ansible.builtin.command: awall activate -f
+      notify: restart fail2ban
 
     - name: save alpine state
       ansible.builtin.command: lbu commit -d
@@ -113,7 +114,7 @@
     # --- awall Firewall (Erweitert für Syncthing & Gitea) ---
     - name: Configure awall base policy with container ports
       ansible.builtin.copy:
-        dest: /etc/awall/private/server.json
+        dest: /etc/awall/optional/server.json
         content: |
           {
             "description": "Single Node Server Firewall",
@@ -126,11 +127,22 @@
             ],
             "filter": [
               { "in": "ext", "service": ["ssh", "ping"], "action": "accept" },
-              { "in": "ext", "port": ["3000/tcp", "2222/tcp"], "action": "accept" },
-              { "in": "ext", "port": ["53/tcp", "53/udp", "3001/tcp", "8080/tcp"], "action": "accept" }
+              { "in": "ext", "port": [22000, 8384], "protocol": "tcp", "action": "accept" },
+              { "in": "ext", "port": [22000, 21027], "protocol": "udp", "action": "accept" },
+              { "in": "ext", "port": [3000, 2222], "protocol": "tcp", "action": "accept" },
+              { "in": "ext", "port": [53, 3001, 8080], "protocol": "tcp", "action": "accept" },
+              { "in": "ext", "port": 53, "protocol": "udp", "action": "accept" }
             ]
           }
         mode: '0644'
+      notify: 
+        - activate awall
+        - lbu commit
+
+    - name: Enable awall server policies
+      ansible.builtin.command: awall enable server
+      args:
+        creates: /etc/awall/server.json
       notify: 
         - activate awall
         - lbu commit
@@ -148,6 +160,7 @@
         content: |
           [DEFAULT]
           ignoreip = 127.0.0.1/8 192.168.178.0/24
+          banaction = iptables-multiport
 
           [sshd]
           enabled = true
@@ -178,13 +191,14 @@
       notify: "lbu commit"
 
     # --- Rootless Podman: Basis-Pakete & Cgroups ---
-    - name: Install Podman and rootless dependencies
+    - name: Install Podman, Compose and rootless dependencies
       community.general.apk:
         name:
           - podman
-          - shadow           # Wichtig für usermod und subuid/subgid
-          - fuse-overlayfs   # Für rootless storage
-          - slirp4netns      # Für rootless networking
+          - podman-compose   # <-- NEU hinzugefügt
+          - shadow           
+          - fuse-overlayfs   
+          - slirp4netns      
           - iptables
         state: present
         update_cache: yes
@@ -213,8 +227,6 @@
         home: /home/podman_user
       notify: "lbu commit"
 
-    # SubUID und SubGID weisen dem User "podman_user" 65.536 virtuelle IDs zu.
-    # Wenn der Container intern als "root" (UID 0) läuft, ist er auf dem Host in Wahrheit UID 100000.
     - name: Define subuid for podman_user
       ansible.builtin.lineinfile:
         path: /etc/subuid
@@ -236,10 +248,21 @@
       changed_when: false
       notify: "lbu commit"
 
-    # --- Schritt 3: Persistenz & Rechte ---
+    # --- Persistenz & Rechte ---
+    - name: Create persistent data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: podman_user
+        group: podman
+        mode: '0755'
+      loop:
+        - /mnt/data/syncthing
+        - /mnt/data/gitea
+        - /mnt/data/adguard/work
+        - /mnt/data/adguard/conf
+      notify: "lbu commit"
 
-    # Da Rootless Podman eine Laufzeitumgebung (XDG_RUNTIME_DIR) braucht,
-    # legen wir dem User ein lokales Run-Verzeichnis an.
     - name: Create local run directory for podman_user
       ansible.builtin.file:
         path: /home/podman_user/.run
@@ -249,7 +272,6 @@
         mode: '0700'
       notify: "lbu commit"
 
-    # --- AdGuard Home: Kernel & Persistenz ---
     - name: Allow unprivileged users to bind to port 53 (DNS)
       ansible.builtin.copy:
         dest: /etc/sysctl.d/99-rootless.conf
@@ -264,95 +286,82 @@
       ansible.builtin.command: sysctl -p /etc/sysctl.d/99-rootless.conf
       changed_when: false
 
-    - name: Create persistent AdGuard Home directories
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        owner: podman_user
-        group: podman
-        mode: '0755'
-      loop:
-        - /mnt/data/adguard/work
-        - /mnt/data/adguard/conf
-      notify: "lbu commit"
-
-    # --- Schritt 4: OpenRC Auto-Start Skript ---
-    # --- Gitea: Persistenz & Rechte ---
-    - name: Create persistent Gitea data directory
-      ansible.builtin.file:
-        path: /mnt/data/gitea
-        state: directory
-        owner: podman_user
-        group: podman
-        mode: '0755'
-      notify: "lbu commit"
-
-    # --- Gitea: OpenRC Auto-Start Skript ---
-    - name: Create OpenRC init script for Gitea
+    # --- NEU: Podman Compose Setup ---
+    - name: Deploy docker-compose.yml
       ansible.builtin.copy:
-        dest: /etc/init.d/gitea
+        dest: /mnt/data/docker-compose.yml
+        owner: podman_user
+        group: podman
+        mode: '0644'
+        content: |
+          version: '3'
+          services:
+            syncthing:
+              image: docker.io/syncthing/syncthing:latest
+              container_name: syncthing
+              restart: unless-stopped
+              ports:
+                - "8384:8384"
+                - "22000:22000/tcp"
+                - "22000:22000/udp"
+                - "21027:21027/udp"
+              volumes:
+                - /mnt/data/syncthing:/var/syncthing
+
+            gitea:
+              image: docker.io/gitea/gitea:latest
+              container_name: gitea
+              restart: unless-stopped
+              ports:
+                - "3000:3000"
+                - "2222:22"
+              volumes:
+                - /mnt/data/gitea:/data
+
+            adguard:
+              image: docker.io/adguard/adguardhome:latest
+              container_name: adguard
+              restart: unless-stopped
+              ports:
+                - "53:53/tcp"
+                - "53:53/udp"
+                - "3001:3000/tcp"
+                - "8080:80/tcp"
+              volumes:
+                - /mnt/data/adguard/work:/opt/adguardhome/work
+                - /mnt/data/adguard/conf:/opt/adguardhome/conf
+      notify: "lbu commit"
+
+    - name: Create OpenRC init script for podman-compose
+      ansible.builtin.copy:
+        dest: /etc/init.d/containers
         mode: '0755'
         content: |
           #!/sbin/openrc-run
           
-          name="Gitea (Rootless Podman)"
-          description="Runs Gitea in a rootless container"
-          
-          pidfile="/run/gitea.pid"
-          command="/bin/su"
-          # Gitea läuft auf Port 3000 (HTTP) und wir mappen den internen SSH-Port (22) auf 2222 nach außen.
-          command_args="-l podman_user -c 'export XDG_RUNTIME_DIR=/home/podman_user/.run; podman run --rm --name gitea -p 3000:3000 -p 2222:22 -v /mnt/data/gitea:/data docker.io/gitea/gitea:latest'"
-          command_background="yes"
+          name="Podman Compose Containers"
+          description="Runs rootless containers via podman-compose"
           
           depend() {
               need net localmount
               after firewall
           }
           
-          stop_pre() {
-              ebegin "Stopping rootless podman container: gitea"
-              su -l podman_user -c "export XDG_RUNTIME_DIR=/home/podman_user/.run; podman stop gitea"
+          start() {
+              ebegin "Starting containers via podman-compose"
+              su -l podman_user -c "export XDG_RUNTIME_DIR=/home/podman_user/.run; podman-compose -f /mnt/data/docker-compose.yml up -d"
+              eend $?
+          }
+          
+          stop() {
+              ebegin "Stopping containers via podman-compose"
+              su -l podman_user -c "export XDG_RUNTIME_DIR=/home/podman_user/.run; podman-compose -f /mnt/data/docker-compose.yml down"
               eend $?
           }
       notify: "lbu commit"
 
-    - name: Enable and start Gitea OpenRC service
+    - name: Enable and start containers OpenRC service
       ansible.builtin.service:
-        name: gitea
-        enabled: yes
-        state: started
-
-    # --- AdGuard Home: OpenRC Auto-Start Skript ---
-    - name: Create OpenRC init script for AdGuard Home
-      ansible.builtin.copy:
-        dest: /etc/init.d/adguard
-        mode: '0755'
-        content: |
-          #!/sbin/openrc-run
-          
-          name="AdGuard Home (Rootless Podman)"
-          description="Runs AdGuard Home in a rootless container"
-          
-          pidfile="/run/adguard.pid"
-          command="/bin/su"
-          # Wir mappen Setup-Port 3000 -> 3001 und Web-Port 80 -> 8080
-          command_args="-l podman_user -c 'export XDG_RUNTIME_DIR=/home/podman_user/.run; podman run --rm --name adguard -p 53:53/tcp -p 53:53/udp -p 3001:3000/tcp -p 8080:80/tcp -v /mnt/data/adguard/work:/opt/adguardhome/work -v /mnt/data/adguard/conf:/opt/adguardhome/conf docker.io/adguard/adguardhome:latest'"
-          command_background="yes"
-          
-          depend() {
-              need net localmount
-              after firewall
-          }
-          
-          stop_pre() {
-              ebegin "Stopping rootless podman container: adguard"
-              su -l podman_user -c "export XDG_RUNTIME_DIR=/home/podman_user/.run; podman stop adguard"
-              eend $?
-          }
-      notify: "lbu commit"
-
-    - name: Enable and start AdGuard Home OpenRC service
-      ansible.builtin.service:
-        name: adguard
+        name: containers
         enabled: yes
         state: started
