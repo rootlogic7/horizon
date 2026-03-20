@@ -182,7 +182,6 @@ in {
 
     # --- FIREFOX THEMING ---
     programs.firefox = {
-      enable = true;
       profiles.haku = {
         # Zwingt Firefox dazu, unsere custom CSS-Dateien zu akzeptieren
         settings = {

@@ -18,5 +18,6 @@
   imports = [
     ../desktop/default.nix
     ../theme.nix
+    ../programs/firefox.nix
   ];
 }
