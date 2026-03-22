@@ -26,6 +26,8 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     restart: unless-stopped
+    depends_on:
+      - adguard
     user: "0:0"
     environment:
       - HOMEPAGE_ALLOWED_HOSTS=192.168.178.69:3002,192.168.178.69

@@ -11,6 +11,8 @@
       - fuse-overlayfs
       - slirp4netns
       - iptables
+      - netavark
+      - aardvark-dns
     state: present
     update_cache: yes
   notify: "lbu commit"
@@ -101,7 +103,7 @@
     owner: podman_user
     group: podman
     mode: '0600'
-    content: "{{ lookup('community.sops.sops', '../../secrets/secrets.yaml', name='adguard_password') }}"
+    content: "{{ lookup('community.sops.sops', '../../secrets/secrets.yaml', name='adguard_password') | trim }}"
   notify: "lbu commit"
 
 # 4. Deployment
