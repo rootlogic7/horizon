@@ -34,6 +34,12 @@ in {
         description = "Die ANSI-Farbe (z.B. 'magenta', 'cyan', 'blue') für Fastfetch";
       };
 
+      wallpaper = mkOption {
+        type = types.nullOr types.path;
+        default = null;
+        description = "Pfad zum Wallpaper-Bild für dieses Theme";
+      };
+
     };
 
     colors = {

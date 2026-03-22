@@ -40,7 +40,9 @@ in {
       # Waybar wird ganz regulär gestartet.
       exec-once = [
         "statusbar-switcher"
-        "${pkgs.swaybg}/bin/swaybg -c '#${theme.colors.bg}'"
+        (if theme.ui.wallpaper != null 
+         then "${pkgs.swaybg}/bin/swaybg -i ${theme.ui.wallpaper} -m fill"
+         else "${pkgs.swaybg}/bin/swaybg -c '#${theme.colors.bg}'")
         "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
       ];

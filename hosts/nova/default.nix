@@ -49,7 +49,7 @@
       imports = [
         #inputs.catppuccin.homeModules.catppuccin
         ../../home/haku.nix
-        ../../skins/kawaii-dark.nix
+        ../../skins/cherry-blossom-dark.nix
       ];
     };
   };
