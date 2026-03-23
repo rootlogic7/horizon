@@ -46,7 +46,7 @@ in {
         "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
 
-        "firefox --new-instance --profile ~/.mozilla/firefox/dashboard --name dashboard http://192.168.178.69:3002"
+        "firefox --new-instance --profile ~/.mozilla/firefox/dashboard --name dashboard http://192.168.178.10:3002"
       ];
 
       workspace = [

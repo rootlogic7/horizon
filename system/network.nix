@@ -13,7 +13,7 @@ in {
     sops.templates."networkmanager.env".content = ''
       WIFI_PSK=${config.sops.placeholder.wifi_psk}
     '';
-
+    networking.nameservers = [ "192.168.178.10" ];
     networking.networkmanager = {
       enable = true;
       ensureProfiles.environmentFiles = [ config.sops.templates."networkmanager.env".path ];
@@ -32,7 +32,12 @@ in {
             key-mgmt = "wpa-psk";
             psk = "$WIFI_PSK";
           };
-          ipv4 = { method = "auto"; };
+          ipv4 = {
+            method = "auto"; 
+            # Das Semikolon am Ende ist wichtig, da dies in eine NetworkManager-Keyfile übersetzt wird!
+            dns = "192.168.178.10;"; 
+            ignore-auto-dns = true;
+          };
           ipv6 = { method = "auto"; };
         };
       };

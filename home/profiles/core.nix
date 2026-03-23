@@ -29,14 +29,14 @@
           identitiesOnly = true;
         };
         "gitea" = {
-          hostname = "192.168.178.69";
+          hostname = "192.168.178.10";
           user = "git";
           port = 2222; # WICHTIG: Der gemappte Container-Port
           identityFile = "~/.ssh/id_ed25519_main";
           identitiesOnly = true;
         };
         "pi" = {
-          hostname = "192.168.178.69";
+          hostname = "192.168.178.10";
           user = "root";
           identityFile = "~/.ssh/id_ed25519_main";
           identitiesOnly = true;

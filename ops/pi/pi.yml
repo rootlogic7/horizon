@@ -90,9 +90,26 @@
             "zone": { "ext": { "iface": "eth0" } },
             "policy": [ { "in": "ext", "action": "drop" }, { "action": "accept" } ],
             "filter": [
-              { "in": "ext", "service": ["ssh", "ping"], "action": "accept" },
-              { "in": "ext", "port": [3000, 2222, 53, 3001, 3002, 5001, 8080], "protocol": "tcp", "action": "accept" },
-              { "in": "ext", "port": 53, "protocol": "udp", "action": "accept" }
+              { 
+                "in": "ext", 
+                "src": ["192.168.178.11", "192.168.178.12"], 
+                "service": ["ssh", "ping"], 
+                "action": "accept" 
+              },
+              { 
+                "in": "ext", 
+                "src": ["192.168.178.11", "192.168.178.12"], 
+                "port": [3000, 2222, 53, 3001, 3002, 5001, 8080], 
+                "protocol": "tcp", 
+                "action": "accept" 
+              },
+              { 
+                "in": "ext", 
+                "src": ["192.168.178.11", "192.168.178.12"], 
+                "port": 53, 
+                "protocol": "udp", 
+                "action": "accept" 
+              }
             ]
           }
         mode: '0644'

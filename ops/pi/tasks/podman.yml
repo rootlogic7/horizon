@@ -139,7 +139,7 @@
       - Infrastructure:
           - Dockge:
               icon: dockge.png
-              href: http://192.168.178.69:5001
+              href: http://192.168.178.10:5001
               description: Container Management
               server: podman-pi
               container: dockge
@@ -147,7 +147,7 @@
       - Network:
           - AdGuard Home:
               icon: adguard-home.png
-              href: http://192.168.178.69:8080
+              href: http://192.168.178.10:8080
               description: DNS Sinkhole
               server: podman-pi
               container: adguard
@@ -160,7 +160,7 @@
       - Development:
           - Gitea:
               icon: gitea.png
-              href: http://192.168.178.69:3000
+              href: http://192.168.178.10:3000
               description: Git Hosting
               server: podman-pi
               container: gitea

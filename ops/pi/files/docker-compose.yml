@@ -36,11 +36,11 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     restart: unless-stopped
-    user: "0:0" # <- Beibehalten für sicheren Secret-Zugriff
+    user: "0:0"
     depends_on:
       - adguard
     environment:
-      - HOMEPAGE_ALLOWED_HOSTS=192.168.178.69:3002,192.168.178.69
+      - HOMEPAGE_ALLOWED_HOSTS=192.168.178.10:3002,192.168.178.10
       - HOMEPAGE_VAR_ADGUARD_USER=haku
       - HOMEPAGE_VAR_ADGUARD_PASSWORD__FILE=/app/secrets/adguard_secret
     ports:
