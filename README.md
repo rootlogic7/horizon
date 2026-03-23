@@ -3,9 +3,9 @@
 Deklarative NixOS- und Ansible-Konfiguration.
 
 ## Hosts
-* `nova` (192.168.178.22): ThinkPad T470. NixOS, Btrfs auf LUKS, Impermanence.
-* `quasar` (192.168.178.21): Workstation. NixOS, ZFS auf LUKS, Impermanence.
-* `pi` (192.168.178.20): Alpine Linux. Ansible, awall (restricted to .21 & .22), Rootless Podman.
+* `nova` (192.168.178.12): ThinkPad T470. NixOS, Btrfs auf LUKS, Impermanence.
+* `quasar` (192.168.178.11): Workstation. NixOS, ZFS auf LUKS, Impermanence.
+* `pi` (192.168.178.10): Alpine Linux. Ansible, awall (restricted to .11 & .12), Rootless Podman.
 
 ## Secrets & State (Impermanence)
 * `/` und `/home` sind flüchtig (ZFS/Btrfs blank snapshot rollback bei Boot).
