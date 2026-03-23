@@ -42,14 +42,13 @@ services:
     environment:
       - HOMEPAGE_ALLOWED_HOSTS=192.168.178.69:3002,192.168.178.69
       - HOMEPAGE_VAR_ADGUARD_USER=haku
-      - HOMEPAGE_VAR_ADGUARD_PASSWORD__FILE=/run/secrets/adguard_password
-    secrets:
-      - adguard_password
+      - HOMEPAGE_VAR_ADGUARD_PASSWORD__FILE=/app/secrets/adguard_secret
     ports:
       - "3002:3000"
     volumes:
       - /mnt/data/homepage:/app/config
       - /tmp/podman_run/podman.sock:/var/run/docker.sock
+      - /mnt/data/stacks/core/.adguard_secret:/app/secrets/adguard_secret:ro
 
   dockge:
     image: docker.io/louislam/dockge:latest
@@ -64,7 +63,3 @@ services:
       - /tmp/podman_run/podman.sock:/var/run/docker.sock
       - /mnt/data/dockge:/app/data
       - /mnt/data/stacks:/opt/stacks
-
-secrets:
-  adguard_password:
-    file: /mnt/data/stacks/core/.adguard_secret
