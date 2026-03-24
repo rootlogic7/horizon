@@ -34,28 +34,33 @@
         # Nixos
         nix-switch = "sudo nixos-rebuild switch --flake .#${osConfig.networking.hostName}";
         nix-update = "nix flake update";
+        rebuild-pi = "ansible-playbook -i inventory.yml pi.yml";
       };
 
-      # Keine manuellen Init-Skripte mehr nötig für Zoxide/Starship!
-      # Fastfetch wird hier beim Start ausgeführt
+      # fastfetch
       extraConfig = ''
         $env.config.show_banner = false
-
-        # Fastfetch beim Start anzeigen
         fastfetch
       '';
     };
 
-    # Zoxide (Smarter cd-Ersatz)
+    # Zoxide
     zoxide = {
       enable = true;
       enableNushellIntegration = true; 
     };
 
-    # Starship Prompt
+    # Starship
     starship = {
       enable = true;
       enableNushellIntegration = true;
+    };
+
+    # Direnv
+    direnv = {
+      enable = true;
+      enableNushellIntegration = true;
+      nix-direnv.enable = true;
     };
   };
 }
