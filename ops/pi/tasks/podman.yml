@@ -56,6 +56,28 @@
     - /etc/subgid
   notify: "lbu commit"
 
+- name: Ensure Podman config directory exists for podman_user
+  ansible.builtin.file:
+    path: /mnt/data/podman_user/.config/containers
+    state: directory
+    owner: podman_user
+    group: podman
+    mode: '0750'
+  notify: "lbu commit"
+
+- name: Disable cgroups for rootless Podman (Docker Compose compatibility)
+  ansible.builtin.copy:
+    dest: /mnt/data/podman_user/.config/containers/containers.conf
+    owner: podman_user
+    group: podman
+    mode: '0644'
+    content: |
+      [containers]
+      cgroups = "disabled"
+  notify: 
+    - restart containers
+    - lbu commit
+
 - name: Allow unprivileged users to bind to port 53 (DNS)
   ansible.builtin.copy:
     dest: /etc/sysctl.d/99-rootless.conf
