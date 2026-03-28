@@ -78,6 +78,20 @@
     - restart containers
     - lbu commit
 
+- name: Allow insecure local Gitea registry for rootless Podman
+  ansible.builtin.copy:
+    dest: /mnt/data/podman_user/.config/containers/registries.conf
+    owner: podman_user
+    group: podman
+    mode: '0644'
+    content: |
+      [[registry]]
+      location = "192.168.178.10:3000"
+      insecure = true
+  notify: 
+    - restart containers
+    - lbu commit
+
 - name: Allow unprivileged users to bind to port 53 (DNS)
   ansible.builtin.copy:
     dest: /etc/sysctl.d/99-rootless.conf

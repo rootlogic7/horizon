@@ -49,7 +49,7 @@ in {
       ];
 
       workspace = [
-        "1, gapsout:${toString theme.ui.homepage.gaps_out}"
+        "name:Server, gapsout:${toString theme.ui.homepage.gaps_out}"
       ];
       # 4. Design & Layout (Verknüpft mit der neuen Theme-Engine)
       general = {
@@ -108,7 +108,8 @@ in {
         "float on, match:class ^(fuzzel)$"
         "float on, match:title ^(Picture-in-Picture)$"
 
-        "workspace 1 silent, match:class ^(dashboard)$"
+        "workspace name:System silent, match:class ^(dashboard)$"
+        "workspace name:Server silent, match:class ^(dashboard)$"
         "opacity ${theme.ui.homepage.opacity} ${theme.ui.homepage.opacity}, match:class ^(dashboard)$"
         "border_size 0, match:class ^(dashboard)$"
       ];
@@ -118,9 +119,9 @@ in {
         "$mod, Return, exec, $terminal"
         "$mod, Space, exec, $menu"
         
-        "$mod, Q, killactive,"
-        "$mod, F, fullscreen,"
-        "$mod SHIFT, Space, togglefloating,"
+        "$mod SHIFT, Q, killactive,"
+        "$mod SHIFT, F, fullscreen,"
+        "$mod, F, togglefloating,"
         "$mod SHIFT, E, exit,"
 
         "$mod, h, movefocus, l"
@@ -128,12 +129,20 @@ in {
         "$mod, k, movefocus, u"
         "$mod, l, movefocus, r"
 
+        "$mod, S, workspace, name:System"
+        "$mod, D, workspace, name:Server"
+
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
         "$mod, 3, workspace, 3"
         "$mod, 4, workspace, 4"
+        "$mod, 5, workspace, 5"
+
         "$mod SHIFT, 1, movetoworkspace, 1"
         "$mod SHIFT, 2, movetoworkspace, 2"
+        "$mod SHIFT, 3, movetoworkspace, 3"
+        "$mod SHIFT, 4, movetoworkspace, 4"
+        "$mod SHIFT, 5, movetoworkspace, 5"
       ];
 
       bindm = [
