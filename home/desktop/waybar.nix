@@ -60,9 +60,13 @@
         };
         ignore-workspaces = [ "System" "Server" ];
         format-icons = { 
-          "active" = "";   # Aktiv (Kreis mit Punkt)
-          "default" = "";  # Belegt, aber inaktiv (Ausgefüllter Kreis)
-          "empty" = "";    # Leer (Nur der Rand des Kreises)
+          "1" = "一";
+          "2" = "二";
+          "3" = "三";
+          "4" = "四";
+          "5" = "五";
+          # Ein Fallback, falls dynamisch Workspace 6+ geöffnet wird
+          "default" = "〇";
         };
       };
     };

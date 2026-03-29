@@ -34,6 +34,7 @@ in {
     # Schriftarten (Fonts)
     fonts.packages = with pkgs; [
       nerd-fonts.departure-mono
+      noto-fonts-cjk-sans
     ];
   };
 }

@@ -78,11 +78,20 @@
     - restart containers
     - lbu commit
 
-- name: Allow insecure local Gitea registry for rootless Podman
+- name: Ensure system-wide containers config directory exists
+  ansible.builtin.file:
+    path: /etc/containers/registries.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  notify: "lbu commit"
+
+- name: Allow insecure local Gitea registry globally
   ansible.builtin.copy:
-    dest: /mnt/data/podman_user/.config/containers/registries.conf
-    owner: podman_user
-    group: podman
+    dest: /etc/containers/registries.conf.d/10-insecure-gitea.conf
+    owner: root
+    group: root
     mode: '0644'
     content: |
       [[registry]]

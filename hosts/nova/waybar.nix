@@ -111,31 +111,35 @@ in {
       
       #workspaces button { 
         padding: 0;
-        min-width: 24px;
-        color: #${theme.colors.accent_tertiary};
+        min-width: 28px;
 
-        /* GTK-Standard-Styling restlos entfernen */
         background: transparent;
         box-shadow: none;
         text-shadow: none;
         border: none;
-        
-        /* Sanfte Abrundung für das spätere Highlight */
         border-radius: ${toString theme.ui.rounding}px; 
         transition: all 0.2s ease;
+
+        /* ZUSTAND 1: LEER (Standard-Ansicht für persistente Workspaces) */
+        color: #${theme.colors.accent_tertiary}; 
+        font-size: 13px;
       }
       
       #workspaces button:hover {
         color: #${theme.colors.accent_secondary};
         background-color: #${theme.colors.inactive_border}; /* Dezenter Hintergrund-Highlight */
-        box-shadow: none; /* Verhindert, dass GTK beim Hovern wieder Schatten reinwirft */
+        box-shadow: none;
         text-shadow: none;
       }
+      
+      #workspaces button:not(.empty):not(.active) {
+        color: #${theme.colors.fg}; /* Weiß/Hell, damit man sofort sieht: Hier läuft was */
+      }
 
-      /* Belegte, aber nicht aktive Workspaces */
+      /* Belegte, aber nicht aktive Workspaces
       #workspaces button:not(.empty) {
         color: #${theme.colors.inactive_border}; 
-      }
+      }*/
       
       #workspaces button.active { 
         color: #${theme.colors.accent_primary};
