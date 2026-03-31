@@ -33,14 +33,14 @@ in {
         # Helle/Bright Farben (8-15)
         # Für unser neutrales Fallback nutzen wir hier einfach die gleichen Farben.
         # In einem späteren Skin kannst du diese bei Bedarf durch hellere Varianten ersetzen.
-        bright0 = theme.colors.term.black;
-        bright1 = theme.colors.term.red;
-        bright2 = theme.colors.term.green;
-        bright3 = theme.colors.term.yellow;
-        bright4 = theme.colors.term.blue;
-        bright5 = theme.colors.term.magenta;
-        bright6 = theme.colors.term.cyan;
-        bright7 = theme.colors.term.white;
+        bright0 = theme.colors.term.bright_black;
+        bright1 = theme.colors.term.bright_red;
+        bright2 = theme.colors.term.bright_green;
+        bright3 = theme.colors.term.bright_yellow;
+        bright4 = theme.colors.term.bright_blue;
+        bright5 = theme.colors.term.bright_magenta;
+        bright6 = theme.colors.term.bright_cyan;
+        bright7 = theme.colors.term.bright_white;
       };
     };
   };

@@ -49,6 +49,15 @@
       magenta = "ce93d8";          # Keywords (Weiches Lila)
       cyan    = "80cbc4";          # Strings (Sanftes Türkis)
       white   = "fce4ec";          # Standard-Text (Identisch mit fg)
+
+      bright_black   = "8e6f81"; # Ein sehr gut lesbares, mittleres Pink-Grau für Completions!
+      bright_red     = "f48fb1"; # Helleres Pink
+      bright_green   = "c8e6c9"; # Helleres Mint
+      bright_yellow  = "fff59d"; # Helleres Gelb
+      bright_blue    = "b3e5fc"; # Helleres Blau
+      bright_magenta = "e1bee7"; # Helleres Lila
+      bright_cyan    = "b2dfdb"; # Helleres Cyan
+      bright_white   = "ffffff"; # Reines Weiß
     };
   };
 }

@@ -85,6 +85,19 @@ in {
         cyan    = mkOption { type = types.str; default = "00cccc"; }; 
         
         white   = mkOption { type = types.str; default = "eeeeee"; }; # Standard-Text im Terminal
+
+        # Helle (Bright) Farben für besseren Kontrast (Completions, Kommentare)
+        bright_black   = mkOption { type = types.str; default = "555555"; };
+
+        bright_red     = mkOption { type = types.str; default = "ff8888"; };
+        bright_yellow  = mkOption { type = types.str; default = "ffff88"; };
+        bright_green   = mkOption { type = types.str; default = "88ff88"; };
+
+        bright_blue    = mkOption { type = types.str; default = "8888ff"; };
+        bright_magenta = mkOption { type = types.str; default = "ff88ff"; };
+        bright_cyan    = mkOption { type = types.str; default = "88ffff"; };
+
+        bright_white   = mkOption { type = types.str; default = "ffffff"; };
       };
     };
   };
