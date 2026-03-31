@@ -37,6 +37,9 @@
         gc = "git commit -m";
         gp = "git push";
 
+        # Neovin
+        v = "nvim";
+
         # Nixos
         nix-switch = "sudo nixos-rebuild switch --flake .#${osConfig.networking.hostName}";
         nix-update = "nix flake update";

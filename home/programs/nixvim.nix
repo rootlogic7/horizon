@@ -86,7 +86,10 @@ in {
         enable = true;
         servers = {
           nixd.enable = true;      # Beste Nix-Integration
-          ansiblels.enable = true; # Für deine Pi-Konfiguration
+          ansiblels = {
+            enable = true; # Für deine Pi-Konfiguration
+            package = pkgs.ansible-language-server;
+          };
           marksman.enable = true;  # LSP für Markdown
           bashls.enable = true;
         };
