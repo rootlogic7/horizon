@@ -115,6 +115,7 @@ in {
       layerrule = [
         "blur on, match:namespace waybar"
         "ignore_alpha 0, match:namespace waybar"
+        "blur on, match:namespace wlogout"
       ];
 
       windowrule = [
@@ -135,8 +136,8 @@ in {
         "$mod SHIFT, Q, killactive,"
         "$mod SHIFT, F, fullscreen,"
         "$mod, F, togglefloating,"
-        "$mod SHIFT, E, exit,"
         "$mod SHIFT, W, exec, systemctl --user restart waybar"
+        "$mod SHIFT, E, exec, wlogout"
 
         "$mod, h, movefocus, l"
         "$mod, j, movefocus, d"

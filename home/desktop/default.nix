@@ -5,6 +5,7 @@
     ./foot.nix
     ./waybar.nix
     ./hyprland.nix
+    ./wlogout.nix
   ];
 
   # Hier könnten in Zukunft Pakete stehen, die *nur* für Systeme
