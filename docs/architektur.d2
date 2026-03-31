@@ -1,0 +1,40 @@
+direction: right
+
+Flake: flake.nix {
+  shape: cylinder
+}
+
+System Module: system/ {
+  style.fill: "#e0f7fa"
+  Nvidia: nvidia.nix
+  Impermanence: impermanence.nix
+  Display: display.nix
+}
+
+Home Manager: home/ {
+  style.fill: "#fff3e0"
+  Shell: shell/default.nix
+  Programme: programs/
+  Desktop: desktop/
+}
+
+Hosts: {
+  Nova: hosts/nova {
+    label: "💻 Nova"
+    shape: package
+  }
+  Quasar: hosts/quasar {
+    label: "🖥️ Quasar"
+    shape: package
+  }
+}
+
+# Verbindungen
+Flake -> System Module
+Flake -> Home Manager
+
+System Module -> Hosts.Nova
+System Module -> Hosts.Quasar
+
+Home Manager -> Hosts.Nova
+Home Manager -> Hosts.Quasar

@@ -5,6 +5,7 @@
   home.packages = with pkgs; [
     hyprpaper
     hypridle
+    logseq
   ];
 
   programs.browserpass = {

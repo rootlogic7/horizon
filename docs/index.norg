@@ -1,0 +1,36 @@
+@document.meta
+title: Horizon System Dokumentation
+description: Meine NixOS Flake Architektur für Nova und Quasar
+authors: haku
+@end
+
+* Horizon (NixOS Flake)
+
+  Willkommen im Wiki meiner Systemkonfiguration. Diese Flake steuert meine Hosts und nutzt Impermanence.
+
+** Aktuelle To-Do's
+   - [x] Neorg in Nixvim integrieren
+   - ( ) Die Neorg-Config aus `nixvim.nix` in ein eigenes Modul auslagern
+   - [ ] Secrets für den Raspberry Pi via SOPS rotieren
+
+** Architektur & Einstiegspunkte
+   Die gesamte Konfiguration ist modular aufgebaut. Hier sind die wichtigsten Absprünge direkt in den Code:
+
+   ~ {/ ../flake.nix}[Der Main-Entrypoint (flake.nix)]
+   ~ {/ ../hosts/nova/default.nix}[Nova (Laptop) Host-Config]
+   ~ {/ ../hosts/quasar/default.nix}[Quasar (Workstation) Host-Config]
+
+** Wichtige Code-Snippets
+   Falls ich mal vergesse, wie das Theme-Binding funktioniert:
+
+   @code nix
+   # home/programs/nixvim.nix
+   extraConfigLua = if theme.ui.nixvim_transparent then ''
+     vim.cmd [[highlight Normal guifg=#${theme.colors.fg} guibg=NONE ctermbg=NONE]]
+   '' else ''
+     -- Fallback Opaque
+   '';
+   @end
+
+** System-Visualisierung
+   Das D2-Diagramm zur Systemarchitektur findest du hier: {/ architektur.d2}[architektur.d2].

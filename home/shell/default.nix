@@ -9,6 +9,12 @@
     fd
     bottom
     starship
+
+    d2             # Modernes, schnelles Diagramming (perfekt für Nushell-Skripte)
+    plantuml       # Klassische komplexe UMLs
+    mermaid-cli    # Mermaid Graphen im Terminal rendern
+    glow           # Markdown Dokumente hübsch in 'foot' lesen
+    taskwarrior3
   ];
 
   #programs.fastfetch = {

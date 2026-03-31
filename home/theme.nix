@@ -183,6 +183,7 @@ in {
         name = "Adwaita-dark";
         package = pkgs.gnome-themes-extra;
       };
+      gtk4.theme = null;
     };
 
     # Wir überschreiben die Kern-Variablen von GTK3 und GTK4 mit unserem bg-Hexwert

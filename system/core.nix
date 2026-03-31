@@ -25,6 +25,7 @@
   environment.sessionVariables = {
     XKB_DEFAULT_LAYOUT = "de";
     XKB_DEFAULT_VARIANT = "nodeadkeys";
+    NIXOS_OZONE_WL = "1";
   };
   # SOPS Secrets Konfiguration
   sops = {

@@ -1,3 +1,4 @@
+# home/programs/nixvim.nix
 { config, pkgs, ... }:
 let
   theme = config.horizon.theme;
@@ -25,11 +26,13 @@ in {
       tabstop = 2;                     
       expandtab = true;
       smartindent = true;
-      clipboard = "unnamedplus"; # System-Clipboard nutzen
+      clipboard = "unnamedplus";
+      # System-Clipboard nutzen
       cursorline = true;
       ignorecase = true;
       smartcase = true;
-      updatetime = 50; # Schnellere Reaktionszeit
+      updatetime = 50;
+      # Schnellere Reaktionszeit
     };
 
     # Leader-Taste auf Space legen
@@ -37,9 +40,11 @@ in {
 
     plugins = {
       # 1. UI & Ästhetik
-      lualine.enable = true; # Schicke Statusleiste
+      lualine.enable = true;
+      # Schicke Statusleiste
       web-devicons.enable = true;
-      which-key.enable = true; # Zeigt Tastenkürzel-Hilfen an
+      which-key.enable = true;
+      # Zeigt Tastenkürzel-Hilfen an
       
       # 2. Syntax Highlighting (Treesitter)
       treesitter = {
@@ -72,7 +77,8 @@ in {
       lsp = {
         enable = true;
         servers = {
-          nixd.enable = true; # Perfekt für NixOS Flakes
+          nixd.enable = true;
+          # Perfekt für NixOS Flakes
           bashls.enable = true;
           # Hier kannst du weitere Server aktivieren (z.B. rust_analyzer, pyright, tsserver)
         };
@@ -106,15 +112,52 @@ in {
       # 7. Git Integration
       gitsigns.enable = true;
       fugitive.enable = true;
+      neogit.enable = true;
+
+      # 8. Notizen & Game Design (Neorg)
+      neorg = {
+        enable = true;
+        
+        modules = {
+          "core.defaults" = {
+            __empty = null;
+          };
+          "core.concealer" = {
+            __empty = null;
+          };
+        };
+      };
     };
 
-    # Keybinds für den Explorer
+    extraConfigLuaPre = ''
+      vim.api.nvim_create_autocmd("VimEnter", {
+        callback = function()
+          local neorg = require("neorg")
+          neorg.modules.load_module("core.dirman", {
+            config = {
+              workspaces = {
+                zentrale = vim.fn.expand("~/Development/Zentrale")
+              },
+              default_workspace = "zentrale"
+            }
+          })
+        end,
+      })
+    '';
+
+    # Keybinds für den Explorer und Neogit
     keymaps = [
       {
         action = "<cmd>Neotree toggle<CR>";
         key = "<leader>e";
         mode = "n";
         options = { desc = "Toggle File Explorer"; };
+      }
+      {
+        action = "<cmd>Neogit<CR>";
+        key = "<leader>gg";
+        mode = "n";
+        options = { desc = "Toggle Neogit"; };
       }
     ];
   };
